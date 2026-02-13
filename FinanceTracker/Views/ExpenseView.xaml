@@ -1,0 +1,33 @@
+﻿<UserControl x:Class="FinanceTracker.Views.ExpenseView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:FinanceTracker.ViewModels">
+    
+    <UserControl.DataContext>
+        <vm:ExpenseViewModel/>
+    </UserControl.DataContext>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+            <TextBox Width="120" Margin="5" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox Width="80" Margin="5" Text="{Binding Amount, UpdateSourceTrigger=PropertyChanged}" />
+            <ComboBox Width="120" Margin="5" ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory}"/>
+            <DatePicker Width="140" Margin="5" SelectedDate="{Binding Date}"/>
+            <Button Width="100" Content="Add" Command="{Binding AddExpenseCommand}"/>
+        </StackPanel>
+
+        <DataGrid Grid.Row="1" ItemsSource="{Binding Expenses}" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
+                <DataGridTextColumn Header="Amount" Binding="{Binding Amount}"/>
+                <DataGridTextColumn Header="Category" Binding="{Binding Category}"/>
+                <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=d}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>
