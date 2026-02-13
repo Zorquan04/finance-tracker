@@ -1,14 +1,20 @@
-﻿using System.Configuration;
-using System.Data;
-using System.Windows;
+﻿using System.Windows;
+using FinanceTracker.ViewModels;
+using FinanceTracker.Views;
 
-namespace FinanceTracker
+namespace FinanceTracker;
+
+public partial class App : Application
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
-    public partial class App : Application
+    protected override void OnStartup(StartupEventArgs e)
     {
-    }
+        base.OnStartup(e);
 
+        var mainWindow = new MainWindow
+        {
+            DataContext = new MainViewModel()
+        };
+
+        mainWindow.Show();
+    }
 }

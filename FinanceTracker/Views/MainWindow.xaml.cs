@@ -1,12 +1,11 @@
 ﻿using System.Windows;
 
-namespace FinanceTracker
+namespace FinanceTracker.Views;
+
+public partial class MainWindow : Window
 {
-    public partial class MainWindow : Window
+    public MainWindow()
     {
-        public MainWindow()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }
