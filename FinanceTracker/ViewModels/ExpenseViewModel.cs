@@ -4,23 +4,20 @@ using System.Collections.ObjectModel;
 using System.Windows.Input;
 using System.ComponentModel;
 using System.Windows.Data;
+using FinanceTracker.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinanceTracker.ViewModels;
 
 public class ExpenseViewModel : BaseViewModel
 {
     public ObservableCollection<Expense> Expenses { get; set; } = new();
-    public ObservableCollection<string> Categories { get; set; } = new()
-    {
-        "Food", "Transport", "Entertainment", "Bills", "Other"
-    };
-
-    public ObservableCollection<string> FilterCategories { get; } = new() 
-    { 
-        "All", "Food", "Transport", "Entertainment", "Bills", "Other" 
-    };
+    public ObservableCollection<Category> Categories { get; set; } = new();
+    public ObservableCollection<Category> FilterCategories { get; set; } = new();
 
     public ICollectionView ExpensesView { get; }
+
+    private readonly FinanceDbContext _context;
 
     private string _name = "";
     public string Name
@@ -43,15 +40,15 @@ public class ExpenseViewModel : BaseViewModel
         set { _totalExpenses = value; OnPropertyChanged(); }
     }
 
-    private string _selectedCategory = "Other";
-    public string SelectedCategory
+    private Category? _selectedCategory;
+    public Category? SelectedCategory
     {
         get => _selectedCategory;
         set { _selectedCategory = value; OnPropertyChanged(); }
     }
 
-    private string _selectedFilterCategory = "All";
-    public string SelectedFilterCategory
+    private Category? _selectedFilterCategory;
+    public Category? SelectedFilterCategory
     {
         get => _selectedFilterCategory;
         set
@@ -70,7 +67,7 @@ public class ExpenseViewModel : BaseViewModel
         set { _date = value; OnPropertyChanged(); }
     }
 
-    private DateTime? _startDate = null;
+    private DateTime? _startDate;
     public DateTime? StartDate
     {
         get => _startDate;
@@ -83,7 +80,7 @@ public class ExpenseViewModel : BaseViewModel
         }
     }
 
-    private DateTime? _endDate = null;
+    private DateTime? _endDate;
     public DateTime? EndDate
     {
         get => _endDate;
@@ -96,7 +93,7 @@ public class ExpenseViewModel : BaseViewModel
         }
     }
 
-    private bool _filtersVisible = false;
+    private bool _filtersVisible;
     public bool FiltersVisible
     {
         get => _filtersVisible;
@@ -109,33 +106,52 @@ public class ExpenseViewModel : BaseViewModel
 
     public ExpenseViewModel()
     {
+        _context = new FinanceDbContext();
+
+        LoadCategories();
+        LoadExpenses();
+
         ExpensesView = CollectionViewSource.GetDefaultView(Expenses);
         ExpensesView.Filter = FilterExpenses;
 
         AddExpenseCommand = new RelayCommand(_ =>
         {
-            if (string.IsNullOrWhiteSpace(Name) || Amount <= 0)
+            if (string.IsNullOrWhiteSpace(Name) || Amount <= 0 || SelectedCategory == null)
                 return;
 
-            Expenses.Add(new Expense
+            var newExpense = new Expense
             {
-                Name = this.Name,
-                Amount = this.Amount,
-                Category = this.SelectedCategory,
-                Date = this.Date
-            });
+                Name = Name,
+                Amount = Amount,
+                Date = Date,
+                CategoryId = SelectedCategory.Id
+            };
+
+            _context.Expenses.Add(newExpense);
+            _context.SaveChanges();
+
+            LoadExpenses();
+            ExpensesView.Refresh();
+            UpdateTotal();
 
             Name = "";
             Amount = 0;
-            SelectedCategory = "Other";
             Date = DateTime.Now;
-
-            ExpensesView.Refresh();
-            UpdateTotal();
         });
 
-        ToggleFiltersCommand = new RelayCommand(_ => {FiltersVisible = !FiltersVisible; });
-        ClearDateRangeCommand = new RelayCommand(_ => {StartDate = null; EndDate = null; });
+        ToggleFiltersCommand = new RelayCommand(_ =>
+        {
+            FiltersVisible = !FiltersVisible;
+        });
+
+        ClearDateRangeCommand = new RelayCommand(_ =>
+        {
+            StartDate = null;
+            EndDate = null;
+        });
+
+        SelectedCategory = Categories.LastOrDefault();
+        SelectedFilterCategory = FilterCategories.FirstOrDefault();
     }
 
     private bool FilterExpenses(object obj)
@@ -143,7 +159,7 @@ public class ExpenseViewModel : BaseViewModel
         if (obj is not Expense expense)
             return false;
 
-        if (SelectedFilterCategory != "All" && expense.Category != SelectedFilterCategory)
+        if (SelectedFilterCategory != null && SelectedFilterCategory.Id != 0 && expense.CategoryId != SelectedFilterCategory.Id)
             return false;
 
         if (StartDate.HasValue && expense.Date < StartDate.Value)
@@ -158,5 +174,29 @@ public class ExpenseViewModel : BaseViewModel
     private void UpdateTotal()
     {
         TotalExpenses = Expenses.Where(e => FilterExpenses(e)).Sum(e => e.Amount);
+    }
+
+    private void LoadCategories()
+    {
+        var categories = _context.Categories.ToList();
+
+        Categories = new ObservableCollection<Category>(categories);
+
+        var allCategory = new Category { Id = 0, Name = "All" };
+        FilterCategories = new ObservableCollection<Category> { allCategory };
+        foreach (var c in categories)
+            FilterCategories.Add(c);
+
+        OnPropertyChanged(nameof(Categories));
+        OnPropertyChanged(nameof(FilterCategories));
+    }
+
+    private void LoadExpenses()
+    {
+        var expenses = _context.Expenses.Include(e => e.Category).ToList();
+
+        Expenses.Clear();
+        foreach (var e in expenses)
+            Expenses.Add(e);
     }
 }

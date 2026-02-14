@@ -21,7 +21,7 @@
         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
             <TextBox Width="120" Margin="5" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
             <TextBox Width="80" Margin="5" Text="{Binding Amount, UpdateSourceTrigger=PropertyChanged}" />
-            <ComboBox Width="120" Margin="5" ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory}"/>
+            <ComboBox Width="120" Margin="5" ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory}" DisplayMemberPath="Name" />
             <DatePicker Width="140" Margin="5" SelectedDate="{Binding Date, Mode=TwoWay}" DisplayDateEnd="{x:Static sys:DateTime.Now}" />
             <Button Width="100" Height="25" Content="Add" Command="{Binding AddExpenseCommand}" Margin="10,0,0,0"/>
         </StackPanel>
@@ -29,7 +29,7 @@
         <Button Width="120" Height="25" Content="Show filters" Command="{Binding ToggleFiltersCommand}" HorizontalAlignment="Right" Margin="0,0,0,10"/>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,10,0,10" Visibility="{Binding FiltersVisible, Converter={StaticResource BoolToVis}}">
-            <ComboBox Width="120" ItemsSource="{Binding FilterCategories}" SelectedItem="{Binding SelectedFilterCategory}" />
+            <ComboBox Width="120" ItemsSource="{Binding FilterCategories}" SelectedItem="{Binding SelectedFilterCategory}" DisplayMemberPath="Name" />
             <DatePicker Width="120" SelectedDate="{Binding StartDate, Mode=TwoWay}" DisplayDateEnd="{x:Static sys:DateTime.Now}" Margin="10,0,0,0" />
             <TextBlock VerticalAlignment="Center" Margin="5,0">—</TextBlock>
             <DatePicker Width="120" SelectedDate="{Binding EndDate, Mode=TwoWay}" DisplayDateEnd="{x:Static sys:DateTime.Now}" Margin="0,0,5,0" />
@@ -41,7 +41,7 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
                 <DataGridTextColumn Header="Amount" Binding="{Binding Amount}"/>
-                <DataGridTextColumn Header="Category" Binding="{Binding Category}"/>
+                <DataGridTextColumn Header="Category" Binding="{Binding Category.Name}"/>
                 <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=d}"/>
             </DataGrid.Columns>
         </DataGrid>

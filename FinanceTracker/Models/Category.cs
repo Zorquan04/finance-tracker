@@ -1,6 +1,14 @@
-﻿namespace FinanceTracker.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace FinanceTracker.Models;
 
 public class Category
 {
-    public string Name { get; set; } = string.Empty;
+    [Key]
+    public int Id { get; set; }
+
+    [Required]
+    public string? Name { get; set; }
+
+    public ICollection<Expense>? Expenses { get; set; }
 }
