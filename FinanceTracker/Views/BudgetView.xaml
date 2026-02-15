@@ -1,0 +1,7 @@
+﻿<UserControl x:Class="FinanceTracker.Views.BudgetView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <TextBlock Text="Budget placeholder" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" Foreground="Gray"/>
+    </Grid>
+</UserControl>

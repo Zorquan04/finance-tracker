@@ -18,6 +18,7 @@ public class ExpenseViewModel : BaseViewModel
     public ICollectionView ExpensesView { get; }
 
     private readonly FinanceDbContext _context;
+    private readonly ChartsViewModel _chartsVM;
 
     private string _name = "";
     public string Name
@@ -104,9 +105,10 @@ public class ExpenseViewModel : BaseViewModel
     public ICommand ToggleFiltersCommand { get; }
     public ICommand ClearDateRangeCommand { get; }
 
-    public ExpenseViewModel()
+    public ExpenseViewModel(ChartsViewModel chartsVM)
     {
         _context = new FinanceDbContext();
+        _chartsVM = chartsVM;
 
         LoadCategories();
         LoadExpenses();
@@ -132,6 +134,7 @@ public class ExpenseViewModel : BaseViewModel
 
             LoadExpenses();
             ExpensesView.Refresh();
+            _chartsVM.Refresh();
             UpdateTotal();
 
             Name = "";
