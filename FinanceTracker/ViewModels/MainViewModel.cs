@@ -14,13 +14,14 @@ public class MainViewModel : BaseViewModel
 
     public ChartsViewModel ChartsVM { get; }
     public ExpenseViewModel ExpensesVM { get; }
+    public BudgetViewModel BudgetVM { get; }
 
     public MainViewModel()
     {
         ChartsVM = new ChartsViewModel();
-        ExpensesVM = new ExpenseViewModel(ChartsVM);
-        var budgetVM = new BudgetViewModel();
-
+        BudgetVM = new BudgetViewModel();
+        ExpensesVM = new ExpenseViewModel(ChartsVM, BudgetVM);
+        
         ShowExpensesCommand = new RelayCommand(_ => ShowExpensesRequested?.Invoke());
         ShowChartsCommand = new RelayCommand(_ => ShowChartsRequested?.Invoke());
         ShowBudgetCommand = new RelayCommand(_ => ShowBudgetRequested?.Invoke());

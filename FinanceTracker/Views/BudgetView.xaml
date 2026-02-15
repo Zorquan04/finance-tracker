@@ -1,7 +1,29 @@
 ﻿<UserControl x:Class="FinanceTracker.Views.BudgetView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Grid>
-        <TextBlock Text="Budget placeholder" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" Foreground="Gray"/>
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:FinanceTracker.ViewModels">
+    <UserControl.DataContext>
+        <vm:BudgetViewModel/>
+    </UserControl.DataContext>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,20" HorizontalAlignment="Center">
+            <TextBlock VerticalAlignment="Center" Text="Monthly Budget:" FontWeight="Bold"/>
+            <TextBox Width="100" Margin="10,0,0,0" Text="{Binding MonthlyLimit, UpdateSourceTrigger=PropertyChanged}" />
+            <Button Content="Save" Width="80" Margin="10,0,0,0" Command="{Binding SaveBudgetCommand}"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,20" HorizontalAlignment="Center">
+            <TextBlock Text="Spent this month:" FontWeight="Bold"/>
+            <TextBlock Text="{Binding SpentThisMonth, StringFormat={}{0:N2} zł}" Margin="10,0,0,0"/>
+        </StackPanel>
+
+        <ProgressBar Grid.Row="2" Height="30" Minimum="0" Maximum="100" Value="{Binding UsedPercentage, Mode=OneWay}" VerticalAlignment="Bottom"/>
     </Grid>
 </UserControl>

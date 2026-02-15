@@ -10,6 +10,6 @@ namespace FinanceTracker.Models
         public int Year { get; set; }
         public int Month { get; set; }
 
-        public decimal BudgetAmount { get; set; }
+        public decimal Limit { get; set; }
     }
 }
