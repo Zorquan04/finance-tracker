@@ -21,6 +21,16 @@
     </Window.DataContext>
     
     <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open" Command="{Binding OpenCommand}" />
+                <MenuItem Header="_Save" Command="{Binding SaveCommand}" />
+                <MenuItem Header="Save _As" Command="{Binding SaveAsCommand}" />
+                <Separator/>
+                <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
+            </MenuItem>
+        </Menu>
+
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" DockPanel.Dock="Bottom" Height="40">
             <Button Content="Expenses" Width="120" Margin="5" Command="{Binding ShowExpensesCommand}"/>
             <Button Content="Charts" Width="120" Margin="5" Command="{Binding ShowChartsCommand}"/>

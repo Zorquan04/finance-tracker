@@ -135,10 +135,9 @@ public class ExpenseViewModel : BaseViewModel
             _context.SaveChanges();
 
             LoadExpenses();
-            ExpensesView.Refresh();
+            RefreshView();
             _chartsVM.Refresh();
             _budgetVM?.UpdateSpent();
-            UpdateTotal();
 
             Name = "";
             Amount = 0;
@@ -189,9 +188,7 @@ public class ExpenseViewModel : BaseViewModel
         Categories = new ObservableCollection<Category>(categories);
 
         var allCategory = new Category { Id = 0, Name = "All" };
-        FilterCategories = new ObservableCollection<Category> { allCategory };
-        foreach (var c in categories)
-            FilterCategories.Add(c);
+        FilterCategories = new ObservableCollection<Category>(new[] { new Category { Id = 0, Name = "All" } }.Concat(categories));
 
         OnPropertyChanged(nameof(Categories));
         OnPropertyChanged(nameof(FilterCategories));
@@ -204,5 +201,19 @@ public class ExpenseViewModel : BaseViewModel
         Expenses.Clear();
         foreach (var e in expenses)
             Expenses.Add(e);
+    }
+
+    private void RefreshView()
+    {
+        ExpensesView.Refresh();
+        UpdateTotal();
+    }
+
+    public void Reload()
+    {
+        LoadCategories();
+        LoadExpenses();
+        ExpensesView.Refresh();
+        UpdateTotal();
     }
 }

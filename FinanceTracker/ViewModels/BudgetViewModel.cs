@@ -68,4 +68,9 @@ public class BudgetViewModel : BaseViewModel
         _context.SaveChanges();
         UpdateSpent();
     }
+
+    public void Reload()
+    {
+        LoadBudget();
+    }
 }
