@@ -15,7 +15,7 @@
 
         <StackPanel Orientation="Horizontal" Margin="0,0,0,20" HorizontalAlignment="Center">
             <TextBlock VerticalAlignment="Center" Text="Monthly Budget:" FontWeight="Bold"/>
-            <TextBox Width="100" Margin="10,0,0,0" Text="{Binding MonthlyLimit, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox Width="100" Margin="10,0,0,0" Text="{Binding MonthlyLimit, UpdateSourceTrigger=PropertyChanged,StringFormat=F2}" />
             <Button Content="Save" Width="80" Margin="10,0,0,0" Command="{Binding SaveBudgetCommand}"/>
         </StackPanel>
 

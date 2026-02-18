@@ -16,7 +16,7 @@
 
         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
             <TextBox Width="120" Margin="5" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
-            <TextBox Width="80" Margin="5" Text="{Binding Amount, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox Width="80" Margin="5" Text="{Binding Amount, UpdateSourceTrigger=PropertyChanged,StringFormat=F2}" />
             <ComboBox Width="120" Margin="5" ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory}" DisplayMemberPath="Name" />
             <DatePicker Width="140" Margin="5" SelectedDate="{Binding Date, Mode=TwoWay}" DisplayDateEnd="{x:Static sys:DateTime.Now}" />
             <Button Width="100" Height="25" Content="Add" Command="{Binding AddExpenseCommand}" Margin="10,0,0,0"/>
@@ -33,13 +33,39 @@
             <TextBlock Margin="20,0,0,0" VerticalAlignment="Center" FontWeight="Bold" Text="{Binding TotalExpenses, StringFormat=Total: {0:N2} zł}" />
         </StackPanel>
 
-        <DataGrid Grid.Row="2" ItemsSource="{Binding ExpensesView}" AutoGenerateColumns="False">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
-                <DataGridTextColumn Header="Amount" Binding="{Binding Amount}"/>
-                <DataGridTextColumn Header="Category" Binding="{Binding Category.Name}"/>
-                <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=d}"/>
-            </DataGrid.Columns>
-        </DataGrid>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="120" />
+            </Grid.ColumnDefinitions>
+
+            <DataGrid Grid.Column="0" ItemsSource="{Binding ExpensesView}" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single" SelectionUnit="FullRow" SelectedItem="{Binding SelectedExpense}" CanUserSortColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
+                    <DataGridTextColumn Header="Amount" Binding="{Binding Amount, StringFormat=F2}" />
+                    <DataGridTextColumn Header="Category" Binding="{Binding Category.Name}" />
+                    <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=dd/MM/yyyy}" />
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
+                <StackPanel.Resources>
+                    <Style TargetType="Button">
+                        <Setter Property="Margin" Value="0,4"/>
+                    </Style>
+                </StackPanel.Resources>
+
+                <Button Content="Sort Name" Command="{Binding SortByNameCommand}" />
+                <Button Content="Sort Amount" Command="{Binding SortByAmountCommand}" />
+                <Button Content="Sort Category" Command="{Binding SortByCategoryCommand}" />
+                <Button Content="Sort Date" Command="{Binding SortByDateCommand}" />
+
+                <Button Content="Up" Command="{Binding MoveUpCommand}" />
+                <Button Content="Down" Command="{Binding MoveDownCommand}" />
+
+                <Button Content="Edit" Command="{Binding EditCommand}" />
+                <Button Content="Delete" Command="{Binding DeleteCommand}" />
+            </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>

@@ -16,5 +16,6 @@ public class Expense
     public DateTime Date { get; set; }
 
     public int CategoryId { get; set; }
-    public Category? Category { get; set; }    
+    public Category? Category { get; set; }
+    public int OrderIndex { get; set; }
 }

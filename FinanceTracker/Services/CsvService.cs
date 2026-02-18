@@ -9,8 +9,10 @@ public class CsvService : ICsvService
 {
     public void Export(string filePath, IEnumerable<Expense> expenses, decimal monhtlyLimit)
     {
-        var lines = new List<string>();
-        lines.Add("Id;Name;Amount;Category;Date;Limit");
+        var lines = new List<string>
+        {
+            "Id;Name;Amount;Category;Date;Limit"
+        };
 
         bool first = true;
 

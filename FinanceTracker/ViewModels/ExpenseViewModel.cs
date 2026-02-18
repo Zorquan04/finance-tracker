@@ -21,6 +21,9 @@ public class ExpenseViewModel : BaseViewModel
     private readonly ChartsViewModel _chartsVM;
     private readonly BudgetViewModel? _budgetVM;
 
+    private bool _sortAscending = true;
+    private string? _lastSortColumn;
+
     private string _name = "";
     public string Name
     {
@@ -95,16 +98,50 @@ public class ExpenseViewModel : BaseViewModel
         }
     }
 
+    private Expense? _selectedExpense;
+    public Expense? SelectedExpense
+    {
+        get => _selectedExpense;
+        set
+        {
+            _selectedExpense = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private bool _isEditing;
+    public bool IsEditing
+    {
+        get => _isEditing;
+        set
+        {
+            _isEditing = value;
+            OnPropertyChanged();
+        }
+    }
+
     private bool _filtersVisible;
     public bool FiltersVisible
     {
         get => _filtersVisible;
-        set { _filtersVisible = value; OnPropertyChanged(); }
+        set 
+        { 
+            _filtersVisible = value; 
+            OnPropertyChanged(); 
+        }
     }
 
     public ICommand AddExpenseCommand { get; }
     public ICommand ToggleFiltersCommand { get; }
     public ICommand ClearDateRangeCommand { get; }
+    public ICommand DeleteCommand { get; }
+    public ICommand EditCommand { get; }
+    public ICommand MoveUpCommand { get; }
+    public ICommand MoveDownCommand { get; }
+    public ICommand SortByNameCommand { get; }
+    public ICommand SortByAmountCommand { get; }
+    public ICommand SortByCategoryCommand { get; }
+    public ICommand SortByDateCommand { get; }
 
     public ExpenseViewModel(ChartsViewModel chartsVM, BudgetViewModel budgetVM)
     {
@@ -112,37 +149,24 @@ public class ExpenseViewModel : BaseViewModel
         _chartsVM = chartsVM;
         _budgetVM = budgetVM;
 
+        DeleteCommand = new RelayCommand(_ => Delete(), _ => SelectedExpense != null);
+        EditCommand = new RelayCommand(_ => StartEdit(), _ => SelectedExpense != null);
+
         LoadCategories();
         LoadExpenses();
 
         ExpensesView = CollectionViewSource.GetDefaultView(Expenses);
         ExpensesView.Filter = FilterExpenses;
 
-        AddExpenseCommand = new RelayCommand(_ =>
-        {
-            if (string.IsNullOrWhiteSpace(Name) || Amount <= 0 || SelectedCategory == null)
-                return;
+        ExpensesView.SortDescriptions.Clear();
+        ExpensesView.SortDescriptions.Add(new SortDescription(nameof(Expense.OrderIndex), ListSortDirection.Ascending));
 
-            var newExpense = new Expense
-            {
-                Name = Name,
-                Amount = Amount,
-                Date = Date,
-                CategoryId = SelectedCategory.Id
-            };
+        AddExpenseCommand = new RelayCommand(_ => SaveExpense(), _ => !string.IsNullOrWhiteSpace(Name) && Amount > 0 && SelectedCategory != null);
 
-            _context.Expenses.Add(newExpense);
-            _context.SaveChanges();
-
-            LoadExpenses();
-            RefreshView();
-            _chartsVM.Refresh();
-            _budgetVM?.UpdateSpent();
-
-            Name = "";
-            Amount = 0;
-            Date = DateTime.Now;
-        });
+        SortByNameCommand = new RelayCommand(_ => SortBy(e => e.Name, "Name"));
+        SortByAmountCommand = new RelayCommand(_ => SortBy(e => e.Amount, "Amount"));
+        SortByCategoryCommand = new RelayCommand(_ => SortBy(e => e.Category?.Name ?? "", "Category"));
+        SortByDateCommand = new RelayCommand(_ => SortBy(e => e.Date, "Date"));
 
         ToggleFiltersCommand = new RelayCommand(_ =>
         {
@@ -154,6 +178,24 @@ public class ExpenseViewModel : BaseViewModel
             StartDate = null;
             EndDate = null;
         });
+
+        MoveUpCommand = new RelayCommand(_ =>
+        {
+            if (SelectedExpense == null) return;
+            var index = Expenses.IndexOf(SelectedExpense);
+            if (index <= 0) return;
+
+            SwapOrder(index, index - 1);
+        }, _ => SelectedExpense != null);
+
+        MoveDownCommand = new RelayCommand(_ =>
+        {
+            if (SelectedExpense == null) return;
+            var index = Expenses.IndexOf(SelectedExpense);
+            if (index >= Expenses.Count - 1) return;
+
+            SwapOrder(index, index + 1);
+        }, _ => SelectedExpense != null);
 
         SelectedCategory = Categories.LastOrDefault();
         SelectedFilterCategory = FilterCategories.FirstOrDefault();
@@ -215,5 +257,143 @@ public class ExpenseViewModel : BaseViewModel
         LoadExpenses();
         ExpensesView.Refresh();
         UpdateTotal();
+    }
+
+    private void SaveExpense()
+    {
+        if (string.IsNullOrWhiteSpace(Name) || Amount <= 0 || SelectedCategory == null)
+            return;
+
+        if (IsEditing)
+            UpdateExpense();
+        else
+            AddExpense();
+    }
+
+    private void AddExpense()
+    {
+        var maxIndex = Expenses.Any() ? Expenses.Max(e => e.OrderIndex) + 1 : 0;
+
+        var newExpense = new Expense
+        {
+            Name = Name,
+            Amount = Amount,
+            Date = Date,
+            CategoryId = SelectedCategory!.Id,
+            OrderIndex = maxIndex
+        };
+
+        _context.Expenses.Add(newExpense);
+        _context.SaveChanges();
+
+        LoadExpenses();
+        RefreshView();
+        _chartsVM.Refresh();
+        _budgetVM?.UpdateSpent();
+
+        ClearForm();
+    }
+
+
+    private void UpdateExpense()
+    {
+        if (SelectedExpense == null)
+            return;
+
+        var expense = _context.Expenses.FirstOrDefault(e => e.Id == SelectedExpense.Id);
+
+        if (expense == null)
+            return;
+
+        expense.Name = Name;
+        expense.Amount = Amount;
+        expense.Date = Date;
+        expense.CategoryId = SelectedCategory!.Id;
+
+        _context.SaveChanges();
+
+        IsEditing = false;
+
+        LoadExpenses();
+        RefreshView();
+        _chartsVM.Refresh();
+        _budgetVM?.UpdateSpent();
+
+        ClearForm();
+    }
+
+    private void StartEdit()
+    {
+        if (SelectedExpense == null)
+            return;
+
+        Name = SelectedExpense.Name!;
+        Amount = SelectedExpense.Amount;
+        Date = SelectedExpense.Date;
+        SelectedCategory = Categories.FirstOrDefault(c => c.Id == SelectedExpense.CategoryId);
+
+        IsEditing = true;
+    }
+
+    private void Delete()
+    {
+        if (SelectedExpense == null)
+            return;
+
+        var expense = _context.Expenses.FirstOrDefault(e => e.Id == SelectedExpense.Id);
+
+        if (expense == null)
+            return;
+
+        _context.Expenses.Remove(expense);
+        _context.SaveChanges();
+
+        LoadExpenses();
+        RefreshView();
+        _chartsVM.Refresh();
+        _budgetVM?.UpdateSpent();
+    }
+
+    private void SwapOrder(int index1, int index2)
+    {
+        var temp = Expenses[index1].OrderIndex;
+        Expenses[index1].OrderIndex = Expenses[index2].OrderIndex;
+        Expenses[index2].OrderIndex = temp;
+
+        Expenses.Move(index1, index2);
+
+        ExpensesView.Refresh();
+    }
+
+    private void ClearForm()
+    {
+        Name = "";
+        Amount = 0;
+        Date = DateTime.Now;
+        IsEditing = false;
+    }
+
+    private void SortBy<T>(Func<Expense, T> keySelector, string columnName)
+    {
+        if (_lastSortColumn == columnName)
+            _sortAscending = !_sortAscending;
+        else
+            _sortAscending = true;
+
+        _lastSortColumn = columnName;
+
+        var sorted = _sortAscending ? Expenses.OrderBy(keySelector).ToList() : Expenses.OrderByDescending(keySelector).ToList();
+
+        for (int i = 0; i < sorted.Count; i++)
+        {
+            sorted[i].OrderIndex = i;
+        }
+
+        Expenses.Clear();
+        foreach (var e in sorted)
+            Expenses.Add(e);
+
+        ExpensesView.Refresh();
+        _context.SaveChanges();
     }
 }
