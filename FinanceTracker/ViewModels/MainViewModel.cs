@@ -1,7 +1,7 @@
-﻿using FinanceTracker.Data;
-using FinanceTracker.Helpers;
+﻿using FinanceTracker.Helpers;
+using FinanceTracker.Models;
 using FinanceTracker.Services;
-using Microsoft.EntityFrameworkCore;
+using FinanceTracker.Services.Interfaces;
 using Microsoft.Win32;
 using System.Windows;
 
@@ -14,7 +14,13 @@ public class MainViewModel : BaseViewModel
     public event Action? ShowBudgetRequested;
 
     private readonly ICsvService _csvService;
+    private readonly IExpenseService _expenseService;
+    private readonly IBudgetService _budgetService;
+    private readonly IChartService _chartService;
     private string? _currentFilePath;
+
+    public bool HasUnsavedChanges =>
+        (ExpensesVM as IUnsavedChanges)?.HasUnsavedChanges == true || (BudgetVM as IUnsavedChanges)?.HasUnsavedChanges == true;
 
     public RelayCommand ShowExpensesCommand { get; }
     public RelayCommand ShowChartsCommand { get; }
@@ -28,14 +34,17 @@ public class MainViewModel : BaseViewModel
     public ExpenseViewModel ExpensesVM { get; }
     public BudgetViewModel BudgetVM { get; }
 
-    public MainViewModel()
+    public MainViewModel(ICsvService csvService, IExpenseService expenseService, IBudgetService budgetService, IChartService chartService)
     {
-        _csvService = new CsvService();
+        _csvService = csvService;
+        _expenseService = expenseService;
+        _budgetService = budgetService;
+        _chartService = chartService;
 
-        ChartsVM = new ChartsViewModel();
-        BudgetVM = new BudgetViewModel();
-        ExpensesVM = new ExpenseViewModel(ChartsVM, BudgetVM);
-        
+        ChartsVM = new ChartsViewModel(_chartService);
+        BudgetVM = new BudgetViewModel(_budgetService);
+        ExpensesVM = new ExpenseViewModel(_expenseService, ChartsVM, BudgetVM);
+
         ShowExpensesCommand = new RelayCommand(_ => ShowExpensesRequested?.Invoke());
         ShowChartsCommand = new RelayCommand(_ => ShowChartsRequested?.Invoke());
         ShowBudgetCommand = new RelayCommand(_ => ShowBudgetRequested?.Invoke());
@@ -74,64 +83,30 @@ public class MainViewModel : BaseViewModel
 
     private void Open()
     {
-        var dialog = new OpenFileDialog
-        {
-            Filter = "CSV files (*.csv)|*.csv"
-        };
-
-        if (dialog.ShowDialog() != true)
-            return;
-
+        var dialog = new OpenFileDialog { Filter = "CSV files (*.csv)|*.csv" };
+        if (dialog.ShowDialog() != true) return;
         _currentFilePath = dialog.FileName;
 
         var (expenses, limit) = _csvService.Import(_currentFilePath);
 
-        using var context = new FinanceDbContext();
-
-        context.Expenses.RemoveRange(context.Expenses);
-        context.MonthlyBudgets.RemoveRange(context.MonthlyBudgets);
-        context.SaveChanges();
-
-        var categoriesCache = context.Categories.ToList();
-
+        _expenseService.ClearAllExpenses();
         foreach (var e in expenses)
         {
-            var categoryName = e.Category?.Name ?? "Other";
-            var existingCategory = context.Categories.FirstOrDefault(c => c.Name == categoryName);
-
-            if (existingCategory == null)
-            {
-                existingCategory = new Models.Category
-
-                {
-                    Name = categoryName
-                };
-
-                context.Categories.Add(existingCategory);
-                categoriesCache.Add(existingCategory);
-            }
-
-            e.CategoryId = existingCategory.Id;
+            e.CategoryId = e.Category?.Id ?? 0;
             e.Category = null;
-
-            context.Expenses.Add(e);
+            _expenseService.AddExpense(e);
         }
-
-        context.SaveChanges();
 
         if (limit > 0)
         {
-            var now = DateTime.Now;
-
-            context.MonthlyBudgets.Add(new Models.MonthlyBudget
+            var budget = new MonthlyBudget
             {
-                Year = now.Year,
-                Month = now.Month,
+                Year = DateTime.Now.Year,
+                Month = DateTime.Now.Month,
                 Limit = limit
-            });
+            };
+            _budgetService.SaveBudget(budget);
         }
-
-        context.SaveChanges();
 
         ExpensesVM.Reload();
         ChartsVM.Refresh();
@@ -140,15 +115,8 @@ public class MainViewModel : BaseViewModel
 
     private void ExportToFile(string path)
     {
-        using var context = new FinanceDbContext();
-
-        var expenses = context.Expenses.Include(e => e.Category).ToList();
-
-        var now = DateTime.Now;
-
-        var budget = context.MonthlyBudgets.FirstOrDefault(b => b.Year == now.Year && b.Month == now.Month);
-
-        var limit = budget?.Limit ?? 0;
+        var expenses = _expenseService.GetAllExpenses();
+        var limit = _budgetService.GetCurrentBudget()?.Limit ?? 0;
 
         _csvService.Export(path, expenses, limit);
     }

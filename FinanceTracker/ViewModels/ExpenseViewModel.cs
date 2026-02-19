@@ -4,12 +4,11 @@ using System.Collections.ObjectModel;
 using System.Windows.Input;
 using System.ComponentModel;
 using System.Windows.Data;
-using FinanceTracker.Data;
-using Microsoft.EntityFrameworkCore;
+using FinanceTracker.Services.Interfaces;
 
 namespace FinanceTracker.ViewModels;
 
-public class ExpenseViewModel : BaseViewModel
+public class ExpenseViewModel : BaseViewModel, IUnsavedChanges
 {
     public ObservableCollection<Expense> Expenses { get; set; } = new();
     public ObservableCollection<Category> Categories { get; set; } = new();
@@ -17,7 +16,7 @@ public class ExpenseViewModel : BaseViewModel
 
     public ICollectionView ExpensesView { get; }
 
-    private readonly FinanceDbContext _context;
+    private readonly IExpenseService _expenseService;
     private readonly ChartsViewModel _chartsVM;
     private readonly BudgetViewModel? _budgetVM;
 
@@ -149,9 +148,9 @@ public class ExpenseViewModel : BaseViewModel
     public ICommand SortByCategoryCommand { get; }
     public ICommand SortByDateCommand { get; }
 
-    public ExpenseViewModel(ChartsViewModel chartsVM, BudgetViewModel budgetVM)
+    public ExpenseViewModel(IExpenseService expenseService, ChartsViewModel chartsVM, BudgetViewModel budgetVM)
     {
-        _context = new FinanceDbContext();
+        _expenseService = expenseService;
         _chartsVM = chartsVM;
         _budgetVM = budgetVM;
 
@@ -237,7 +236,7 @@ public class ExpenseViewModel : BaseViewModel
 
     private void LoadCategories()
     {
-        var categories = _context.Categories.ToList();
+        var categories = _expenseService.GetAllCategories();
 
         Categories = new ObservableCollection<Category>(categories);
 
@@ -250,10 +249,8 @@ public class ExpenseViewModel : BaseViewModel
 
     private void LoadExpenses()
     {
-        var expenses = _context.Expenses.Include(e => e.Category).ToList();
-
         Expenses.Clear();
-        foreach (var e in expenses)
+        foreach (var e in _expenseService.GetAllExpenses())
             Expenses.Add(e);
     }
 
@@ -289,42 +286,33 @@ public class ExpenseViewModel : BaseViewModel
 
     private void AddExpense()
     {
-        var maxIndex = Expenses.Any() ? Expenses.Max(e => e.OrderIndex) + 1 : 0;
-
         var newExpense = new Expense
         {
             Name = Name,
             Amount = Amount,
             Date = Date,
-            CategoryId = SelectedCategory!.Id,
-            OrderIndex = maxIndex
+            CategoryId = SelectedCategory!.Id
         };
 
-        _context.Expenses.Add(newExpense);
-        _context.SaveChanges();
-
+        _expenseService.AddExpense(newExpense);
         AfterDatabaseChange();
         ClearForm();
     }
 
-
     private void UpdateExpense()
     {
-        if (SelectedExpense == null)
-            return;
+        if (SelectedExpense == null) return;
 
-        var expense = _context.Expenses.FirstOrDefault(e => e.Id == SelectedExpense.Id);
+        var updated = new Expense
+        {
+            Id = SelectedExpense.Id,
+            Name = Name,
+            Amount = Amount,
+            Date = Date,
+            CategoryId = SelectedCategory!.Id
+        };
 
-        if (expense == null)
-            return;
-
-        expense.Name = Name;
-        expense.Amount = Amount;
-        expense.Date = Date;
-        expense.CategoryId = SelectedCategory!.Id;
-
-        _context.SaveChanges();
-
+        _expenseService.UpdateExpense(updated);
         AfterDatabaseChange();
         ClearForm();
     }
@@ -350,30 +338,24 @@ public class ExpenseViewModel : BaseViewModel
 
     private void Delete()
     {
-        if (SelectedExpense == null)
-            return;
+        if (SelectedExpense == null) return;
 
-        var expense = _context.Expenses.FirstOrDefault(e => e.Id == SelectedExpense.Id);
-
-        if (expense == null)
-            return;
-
-        _context.Expenses.Remove(expense);
-        _context.SaveChanges();
-
+        _expenseService.DeleteExpense(SelectedExpense.Id);
         AfterDatabaseChange();
     }
 
     private void SwapOrder(int index1, int index2)
     {
-        var temp = Expenses[index1].OrderIndex;
-        Expenses[index1].OrderIndex = Expenses[index2].OrderIndex;
-        Expenses[index2].OrderIndex = temp;
+        if (index1 < 0 || index2 < 0 || index1 >= Expenses.Count || index2 >= Expenses.Count)
+            return;
 
-        Expenses.Move(index1, index2);
+        var temp = Expenses[index1];
+        Expenses[index1] = Expenses[index2];
+        Expenses[index2] = temp;
 
         ExpensesView.Refresh();
-        _context.SaveChanges();
+
+        _expenseService.UpdateOrder(Expenses.ToList());
     }
 
     private void ClearForm()
@@ -395,16 +377,12 @@ public class ExpenseViewModel : BaseViewModel
 
         var sorted = _sortAscending ? Expenses.OrderBy(keySelector).ToList() : Expenses.OrderByDescending(keySelector).ToList();
 
-        for (int i = 0; i < sorted.Count; i++)
-        {
-            sorted[i].OrderIndex = i;
-        }
-
         Expenses.Clear();
         foreach (var e in sorted)
             Expenses.Add(e);
 
         ExpensesView.Refresh();
-        _context.SaveChanges();
+
+        _expenseService.UpdateOrder(Expenses.ToList());
     }
 }

@@ -1,35 +1,47 @@
-﻿using FinanceTracker.Data;
-using FinanceTracker.Helpers;
+﻿using FinanceTracker.Helpers;
 using FinanceTracker.Models;
+using FinanceTracker.Services.Interfaces;
 using System.Windows.Input;
 
 namespace FinanceTracker.ViewModels;
 
-public class BudgetViewModel : BaseViewModel
+public class BudgetViewModel : BaseViewModel, IUnsavedChanges
 {
-    private readonly FinanceDbContext _context;
+    private readonly IBudgetService _budgetService;
 
     private decimal _monthlyLimit;
+    private decimal _originalMonthlyLimit;
     public decimal MonthlyLimit
     {
         get => _monthlyLimit;
-        set { _monthlyLimit = value; OnPropertyChanged(nameof(MonthlyLimit)); }
+        set
+        {
+            _monthlyLimit = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(HasUnsavedChanges));
+        }
     }
 
     private decimal _spentThisMonth;
     public decimal SpentThisMonth
     {
         get => _spentThisMonth;
-        set { _spentThisMonth = value; OnPropertyChanged(nameof(SpentThisMonth)); OnPropertyChanged(nameof(UsedPercentage)); }
+        private set
+        {
+            _spentThisMonth = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(UsedPercentage));
+        }
     }
 
     public decimal UsedPercentage => MonthlyLimit == 0 ? 0 : SpentThisMonth / MonthlyLimit * 100;
+    public bool HasUnsavedChanges => _monthlyLimit != _originalMonthlyLimit;
 
     public ICommand SaveBudgetCommand { get; }
 
-    public BudgetViewModel()
+    public BudgetViewModel(IBudgetService budgetService)
     {
-        _context = new FinanceDbContext();
+        _budgetService = budgetService;
 
         LoadBudget();
         SaveBudgetCommand = new RelayCommand(_ => SaveBudget());
@@ -37,40 +49,31 @@ public class BudgetViewModel : BaseViewModel
 
     private void LoadBudget()
     {
-        var now = DateTime.Now;
-        var budget = _context.MonthlyBudgets.FirstOrDefault(b => b.Year == now.Year && b.Month == now.Month);
-
-        MonthlyLimit = budget?.Limit ?? 0;
+        var budget = _budgetService.GetCurrentBudget();
+        _originalMonthlyLimit = budget.Limit;
+        MonthlyLimit = budget.Limit;
         UpdateSpent();
     }
 
     public void UpdateSpent()
     {
-        var now = DateTime.Now;
-        SpentThisMonth = _context.Expenses.Where(e => e.Date.Year == now.Year && e.Date.Month == now.Month).AsEnumerable().Sum(e => e.Amount);
+        SpentThisMonth = _budgetService.GetSpentThisMonth();
     }
 
     private void SaveBudget()
     {
         var now = DateTime.Now;
-        var budget = _context.MonthlyBudgets.FirstOrDefault(b => b.Year == now.Year && b.Month == now.Month);
-        if (budget != null)
-            budget.Limit = MonthlyLimit;
-        else
+        var budget = new MonthlyBudget
         {
-            _context.MonthlyBudgets.Add(new MonthlyBudget
-            {
-                Year = now.Year,
-                Month = now.Month,
-                Limit = MonthlyLimit
-            });
-        }
-        _context.SaveChanges();
+            Year = now.Year,
+            Month = now.Month,
+            Limit = MonthlyLimit
+        };
+        _budgetService.SaveBudget(budget);
+
+        _originalMonthlyLimit = MonthlyLimit;
         UpdateSpent();
     }
 
-    public void Reload()
-    {
-        LoadBudget();
-    }
+    public void Reload() => LoadBudget();
 }

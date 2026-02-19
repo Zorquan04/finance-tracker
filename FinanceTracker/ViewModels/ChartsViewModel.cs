@@ -1,22 +1,21 @@
-﻿using FinanceTracker.Data;
+﻿using FinanceTracker.Services.Interfaces;
 using LiveCharts;
 using LiveCharts.Wpf;
-using Microsoft.EntityFrameworkCore;
 
 namespace FinanceTracker.ViewModels;
 
 public class ChartsViewModel : BaseViewModel
 {
-    private readonly FinanceDbContext _context;
+    private readonly IChartService _chartService;
 
     public SeriesCollection? SeriesCollection { get; set; }
     public string[]? Labels { get; set; }
 
     public Func<double, string>? YFormatter { get; set; }
 
-    public ChartsViewModel()
+    public ChartsViewModel(IChartService chartService)
     {
-        _context = new FinanceDbContext();
+        _chartService = chartService;
         YFormatter = value => $"{value:N2} zł";
 
         LoadChartData();
@@ -24,17 +23,16 @@ public class ChartsViewModel : BaseViewModel
 
     private void LoadChartData()
     {
-        var expenses = _context.Expenses.AsNoTracking().Include(e => e.Category).ToList();
-        var expensesByCategory = expenses.GroupBy(e => e.Category!.Name).Select(g => new {Category = g.Key, Total = g.Sum(e => e.Amount)}).ToList();
+        var data = _chartService.GetExpensesByCategory().ToList();
 
-        Labels = expensesByCategory.Select(e => e.Category!).ToArray();
+        Labels = data.Select(d => d.Category).ToArray();
 
         SeriesCollection = new SeriesCollection
         {
             new ColumnSeries
             {
                 Title = "Expenses",
-                Values = new ChartValues<decimal>(expensesByCategory.Select(e => e.Total))
+                Values = new ChartValues<decimal>(data.Select(d => d.Total))
             }
         };
 

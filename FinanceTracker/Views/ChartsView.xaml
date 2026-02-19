@@ -9,7 +9,7 @@
 			</lc:CartesianChart.AxisX>
 			
 			<lc:CartesianChart.AxisY>
-				<lc:Axis Title="Amount" LabelFormatter="{Binding Formatter}"></lc:Axis>
+				<lc:Axis Title="Amount" LabelFormatter="{Binding YFormatter}"></lc:Axis>
 			</lc:CartesianChart.AxisY>
 		</lc:CartesianChart>
 	</Grid>

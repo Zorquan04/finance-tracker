@@ -1,6 +1,6 @@
 ﻿using FinanceTracker.Models;
 
-namespace FinanceTracker.Services;
+namespace FinanceTracker.Services.Interfaces;
 
 public interface ICsvService
 {
