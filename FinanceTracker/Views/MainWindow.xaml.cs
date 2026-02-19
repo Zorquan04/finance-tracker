@@ -10,7 +10,7 @@ public partial class MainWindow : Window
     private readonly MainViewModel _mainVM;
 
     private readonly ExpenseView _expenseView;
-    private readonly ChartsView _chartsView;
+    private readonly ChartView _chartView;
     private readonly BudgetView _budgetView;
 
     public MainWindow(MainViewModel mainVM)
@@ -21,13 +21,13 @@ public partial class MainWindow : Window
         DataContext = _mainVM;
 
         _expenseView = new ExpenseView { DataContext = _mainVM.ExpensesVM };
-        _chartsView = new ChartsView { DataContext = _mainVM.ChartsVM };
+        _chartView = new ChartView { DataContext = _mainVM.ChartVM };
         _budgetView = new BudgetView { DataContext = _mainVM.BudgetVM };
 
         MainContent.Content = _expenseView;
 
         _mainVM.ShowExpensesRequested += () => MainContent.Content = _expenseView;
-        _mainVM.ShowChartsRequested += () => MainContent.Content = _chartsView;
+        _mainVM.ShowChartsRequested += () => MainContent.Content = _chartView;
         _mainVM.ShowBudgetRequested += () => MainContent.Content = _budgetView;
     }
 

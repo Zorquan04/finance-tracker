@@ -1,6 +1,5 @@
 ﻿using FinanceTracker.Helpers;
 using FinanceTracker.Models;
-using FinanceTracker.Services;
 using FinanceTracker.Services.Interfaces;
 using Microsoft.Win32;
 using System.Windows;
@@ -30,7 +29,7 @@ public class MainViewModel : BaseViewModel
     public RelayCommand OpenCommand { get; }
     public RelayCommand ExitCommand { get; }
 
-    public ChartsViewModel ChartsVM { get; }
+    public ChartViewModel ChartVM { get; }
     public ExpenseViewModel ExpensesVM { get; }
     public BudgetViewModel BudgetVM { get; }
 
@@ -41,9 +40,9 @@ public class MainViewModel : BaseViewModel
         _budgetService = budgetService;
         _chartService = chartService;
 
-        ChartsVM = new ChartsViewModel(_chartService);
+        ChartVM = new ChartViewModel(_chartService);
         BudgetVM = new BudgetViewModel(_budgetService);
-        ExpensesVM = new ExpenseViewModel(_expenseService, ChartsVM, BudgetVM);
+        ExpensesVM = new ExpenseViewModel(_expenseService, ChartVM, BudgetVM);
 
         ShowExpensesCommand = new RelayCommand(_ => ShowExpensesRequested?.Invoke());
         ShowChartsCommand = new RelayCommand(_ => ShowChartsRequested?.Invoke());
@@ -90,10 +89,33 @@ public class MainViewModel : BaseViewModel
         var (expenses, limit) = _csvService.Import(_currentFilePath);
 
         _expenseService.ClearAllExpenses();
+
+        var existingCategories = _expenseService.GetAllCategories();
+
         foreach (var e in expenses)
         {
-            e.CategoryId = e.Category?.Id ?? 0;
+            var categoryName = e.Category?.Name;
+
+            if (string.IsNullOrWhiteSpace(categoryName))
+                continue;
+
+            var existingCategory = existingCategories
+                .FirstOrDefault(c => c.Name == categoryName);
+
+            if (existingCategory == null)
+            {
+                existingCategory = new Category
+                {
+                    Name = categoryName
+                };
+
+                _expenseService.AddCategory(existingCategory);
+                existingCategories.Add(existingCategory);
+            }
+
+            e.CategoryId = existingCategory.Id;
             e.Category = null;
+
             _expenseService.AddExpense(e);
         }
 
@@ -109,7 +131,7 @@ public class MainViewModel : BaseViewModel
         }
 
         ExpensesVM.Reload();
-        ChartsVM.Refresh();
+        ChartVM.Refresh();
         BudgetVM.Reload();
     }
 

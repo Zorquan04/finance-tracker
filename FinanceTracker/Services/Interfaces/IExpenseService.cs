@@ -7,6 +7,7 @@ public interface IExpenseService
     List<Expense> GetAllExpenses();
     List<Category> GetAllCategories();
     void AddExpense(Expense expense);
+    void AddCategory(Category category);
     void UpdateExpense(Expense expense);
     void DeleteExpense(int expenseId);
     void UpdateOrder(List<Expense> expenses);

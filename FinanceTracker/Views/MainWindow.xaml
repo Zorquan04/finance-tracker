@@ -8,8 +8,8 @@
         MinHeight="450" MinWidth="800"
         WindowStartupLocation="CenterScreen">
     <Window.Resources>
-        <DataTemplate DataType="{x:Type vm:ChartsViewModel}">
-            <v:ChartsView/>
+        <DataTemplate DataType="{x:Type vm:ChartViewModel}">
+            <v:ChartView/>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vm:BudgetViewModel}">

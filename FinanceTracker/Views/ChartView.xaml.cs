@@ -2,9 +2,9 @@
 
 namespace FinanceTracker.Views;
 
-public partial class ChartsView : UserControl
+public partial class ChartView : UserControl
 {
-    public ChartsView()
+    public ChartView()
     {
         InitializeComponent();
     }

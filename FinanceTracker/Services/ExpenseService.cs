@@ -16,7 +16,7 @@ public class ExpenseService : IExpenseService
 
     public List<Expense> GetAllExpenses()
     {
-        return _context.Expenses.Include(e => e.Category).ToList();
+        return _context.Expenses.Include(e => e.Category).OrderBy(e => e.OrderIndex).ToList();
     }
 
     public List<Category> GetAllCategories()
@@ -29,6 +29,12 @@ public class ExpenseService : IExpenseService
         var maxIndex = _context.Expenses.Any() ? _context.Expenses.Max(e => e.OrderIndex) + 1 : 0;
         expense.OrderIndex = maxIndex;
         _context.Expenses.Add(expense);
+        _context.SaveChanges();
+    }
+
+    public void AddCategory(Category category)
+    {
+        _context.Categories.Add(category);
         _context.SaveChanges();
     }
 

@@ -4,7 +4,7 @@ using LiveCharts.Wpf;
 
 namespace FinanceTracker.ViewModels;
 
-public class ChartsViewModel : BaseViewModel
+public class ChartViewModel : BaseViewModel
 {
     private readonly IChartService _chartService;
 
@@ -13,7 +13,7 @@ public class ChartsViewModel : BaseViewModel
 
     public Func<double, string>? YFormatter { get; set; }
 
-    public ChartsViewModel(IChartService chartService)
+    public ChartViewModel(IChartService chartService)
     {
         _chartService = chartService;
         YFormatter = value => $"{value:N2} zł";
