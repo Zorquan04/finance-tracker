@@ -24,10 +24,10 @@ public class ChartsViewModel : BaseViewModel
 
     private void LoadChartData()
     {
-        var expenses = _context.Expenses.Include(e => e.Category).ToList();
-        var expensesByCategory = expenses.GroupBy(e => e.Category.Name).Select(g => new {Category = g.Key, Total = g.Sum(e => e.Amount)}).ToList();
+        var expenses = _context.Expenses.AsNoTracking().Include(e => e.Category).ToList();
+        var expensesByCategory = expenses.GroupBy(e => e.Category!.Name).Select(g => new {Category = g.Key, Total = g.Sum(e => e.Amount)}).ToList();
 
-        Labels = expensesByCategory.Select(e => e.Category).ToArray();
+        Labels = expensesByCategory.Select(e => e.Category!).ToArray();
 
         SeriesCollection = new SeriesCollection
         {

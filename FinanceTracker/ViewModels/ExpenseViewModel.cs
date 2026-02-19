@@ -21,9 +21,13 @@ public class ExpenseViewModel : BaseViewModel
     private readonly ChartsViewModel _chartsVM;
     private readonly BudgetViewModel? _budgetVM;
 
+    public string AddButtonText => IsEditing ? "Save" : "Add";
+    public string EditButtonText => IsEditing ? "Cancel" : "Edit";
+    public bool HasUnsavedChanges => IsEditing || !string.IsNullOrWhiteSpace(Name) || Amount > 0;
+
     private bool _sortAscending = true;
     private string? _lastSortColumn;
-
+    
     private string _name = "";
     public string Name
     {
@@ -117,6 +121,8 @@ public class ExpenseViewModel : BaseViewModel
         {
             _isEditing = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(AddButtonText));
+            OnPropertyChanged(nameof(EditButtonText));
         }
     }
 
@@ -150,7 +156,13 @@ public class ExpenseViewModel : BaseViewModel
         _budgetVM = budgetVM;
 
         DeleteCommand = new RelayCommand(_ => Delete(), _ => SelectedExpense != null);
-        EditCommand = new RelayCommand(_ => StartEdit(), _ => SelectedExpense != null);
+        EditCommand = new RelayCommand(_ =>
+        {
+            if (IsEditing)
+                CancelEdit();
+            else
+                StartEdit();
+        }, _ => SelectedExpense != null);
 
         LoadCategories();
         LoadExpenses();
@@ -259,11 +271,16 @@ public class ExpenseViewModel : BaseViewModel
         UpdateTotal();
     }
 
+    private void AfterDatabaseChange()
+    {
+        LoadExpenses();
+        RefreshView();
+        _chartsVM.Refresh();
+        _budgetVM?.UpdateSpent();
+    }
+
     private void SaveExpense()
     {
-        if (string.IsNullOrWhiteSpace(Name) || Amount <= 0 || SelectedCategory == null)
-            return;
-
         if (IsEditing)
             UpdateExpense();
         else
@@ -286,11 +303,7 @@ public class ExpenseViewModel : BaseViewModel
         _context.Expenses.Add(newExpense);
         _context.SaveChanges();
 
-        LoadExpenses();
-        RefreshView();
-        _chartsVM.Refresh();
-        _budgetVM?.UpdateSpent();
-
+        AfterDatabaseChange();
         ClearForm();
     }
 
@@ -312,13 +325,7 @@ public class ExpenseViewModel : BaseViewModel
 
         _context.SaveChanges();
 
-        IsEditing = false;
-
-        LoadExpenses();
-        RefreshView();
-        _chartsVM.Refresh();
-        _budgetVM?.UpdateSpent();
-
+        AfterDatabaseChange();
         ClearForm();
     }
 
@@ -335,6 +342,12 @@ public class ExpenseViewModel : BaseViewModel
         IsEditing = true;
     }
 
+    private void CancelEdit()
+    {
+        ClearForm();
+        SelectedExpense = null;
+    }
+
     private void Delete()
     {
         if (SelectedExpense == null)
@@ -348,10 +361,7 @@ public class ExpenseViewModel : BaseViewModel
         _context.Expenses.Remove(expense);
         _context.SaveChanges();
 
-        LoadExpenses();
-        RefreshView();
-        _chartsVM.Refresh();
-        _budgetVM?.UpdateSpent();
+        AfterDatabaseChange();
     }
 
     private void SwapOrder(int index1, int index2)
@@ -363,6 +373,7 @@ public class ExpenseViewModel : BaseViewModel
         Expenses.Move(index1, index2);
 
         ExpensesView.Refresh();
+        _context.SaveChanges();
     }
 
     private void ClearForm()
