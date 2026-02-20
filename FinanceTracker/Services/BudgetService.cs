@@ -38,5 +38,10 @@ public class BudgetService : IBudgetService
         return _context.Expenses.Where(e => e.Date.Year == now.Year && e.Date.Month == now.Month).AsEnumerable().Sum(e => e.Amount);
     }
 
-    public void UpdateSpent() { }
+    public decimal GetSpentLastWeek()
+    {
+        var now = DateTime.Now;
+        var lastWeekStart = now.AddDays(-7);
+        return _context.Expenses.Where(e => e.Date >= lastWeekStart && e.Date <= now).AsEnumerable().Sum(e => e.Amount);
+    }
 }

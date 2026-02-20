@@ -28,11 +28,45 @@
             </MenuItem>
         </Menu>
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" DockPanel.Dock="Bottom" Height="40">
-            <Button Content="Expenses" Width="120" Margin="5" Command="{Binding ShowExpensesCommand}"/>
-            <Button Content="Charts" Width="120" Margin="5" Command="{Binding ShowChartsCommand}"/>
-            <Button Content="Budget" Width="120" Margin="5" Command="{Binding ShowBudgetCommand}"/>
-        </StackPanel>
+        <Grid DockPanel.Dock="Bottom" Height="50">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="15"/>
+                <RowDefinition Height="35"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="{Binding StatusMessage}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="LimeGreen" FontWeight="Bold" Opacity="0">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsStatusVisible}" Value="True">
+                                <DataTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.3"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </DataTrigger.EnterActions>
+                                <DataTrigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.3"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </DataTrigger.ExitActions>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+
+            <StackPanel Grid.Row="1"
+                Orientation="Horizontal"
+                HorizontalAlignment="Center">
+                <Button Content="Expenses" Width="120" Margin="5" Command="{Binding ShowExpensesCommand}"/>
+                <Button Content="Charts" Width="120" Margin="5" Command="{Binding ShowChartsCommand}"/>
+                <Button Content="Budget" Width="120" Margin="5" Command="{Binding ShowBudgetCommand}"/>
+            </StackPanel>
+        </Grid>
 
         <ContentControl x:Name="MainContent" />
     </DockPanel>

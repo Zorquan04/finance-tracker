@@ -1,10 +1,11 @@
 ﻿using FinanceTracker.Helpers;
 using FinanceTracker.Models;
-using System.Collections.ObjectModel;
-using System.Windows.Input;
-using System.ComponentModel;
-using System.Windows.Data;
 using FinanceTracker.Services.Interfaces;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows;
+using System.Windows.Data;
+using System.Windows.Input;
 
 namespace FinanceTracker.ViewModels;
 
@@ -207,6 +208,15 @@ public class ExpenseViewModel : BaseViewModel, IUnsavedChanges
     }
 
     private void UpdateTotal() => TotalExpenses = Expenses.Where(e => FilterExpenses(e)).Sum(e => e.Amount);
+
+    private void CheckBudgetOverflow()
+    {
+        if (_budgetVM == null) return;
+
+        if (_budgetVM.SpentThisMonth > _budgetVM.MonthlyLimit && _budgetVM.MonthlyLimit > 0)
+            MessageBox.Show("Budget has been exceeded!", "Budget Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
+    }
+
     private void RefreshView()
     {
         ExpensesView.Refresh();
@@ -252,6 +262,8 @@ public class ExpenseViewModel : BaseViewModel, IUnsavedChanges
         RefreshView();
         _chartVM.Refresh();
         _budgetVM?.UpdateSpent();
+
+        CheckBudgetOverflow();
     }
 
     public void Reload()

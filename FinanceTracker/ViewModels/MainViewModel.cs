@@ -33,6 +33,20 @@ public class MainViewModel : BaseViewModel
     public ExpenseViewModel ExpensesVM { get; }
     public BudgetViewModel BudgetVM { get; }
 
+    private string _statusMessage = "";
+    public string StatusMessage
+    {
+        get => _statusMessage;
+        set => SetProperty(ref _statusMessage, value);
+    }
+
+    private bool _isStatusVisible;
+    public bool IsStatusVisible
+    {
+        get => _isStatusVisible;
+        set => SetProperty(ref _isStatusVisible, value);
+    }
+
     public MainViewModel(ICsvService csvService, IExpenseService expenseService, IBudgetService budgetService, IChartService chartService)
     {
         _csvService = csvService;
@@ -52,6 +66,8 @@ public class MainViewModel : BaseViewModel
         SaveAsCommand = new RelayCommand(_ => SaveAs());
         OpenCommand = new RelayCommand(_ => Open());
         ExitCommand = new RelayCommand(_ => Application.Current.Shutdown());
+
+        BudgetVM.BudgetSaved += () => ShowSuccess("Saved changes");
     }
 
     private void Save()
@@ -141,5 +157,17 @@ public class MainViewModel : BaseViewModel
         var limit = _budgetService.GetCurrentBudget()?.Limit ?? 0;
 
         _csvService.Export(path, expenses, limit);
+
+        ShowSuccess("Saved changes");
+    }
+
+    public async void ShowSuccess(string message)
+    {
+        StatusMessage = message;
+        IsStatusVisible = true;
+
+        await Task.Delay(2000);
+
+        IsStatusVisible = false;
     }
 }
