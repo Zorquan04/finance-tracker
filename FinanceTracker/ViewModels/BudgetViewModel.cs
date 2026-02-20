@@ -1,14 +1,14 @@
 ﻿using FinanceTracker.Helpers;
 using FinanceTracker.Models;
 using FinanceTracker.Services.Interfaces;
-using System.Windows;
 using System.Windows.Input;
 
 namespace FinanceTracker.ViewModels;
 
-public class BudgetViewModel : BaseViewModel, IUnsavedChanges
+public class BudgetViewModel : BaseViewModel
 {
     private readonly IBudgetService _budgetService;
+    private readonly IMessageService _messageService;   
     public ICommand SaveBudgetCommand { get; }
 
     public event Action? BudgetSaved;
@@ -58,9 +58,10 @@ public class BudgetViewModel : BaseViewModel, IUnsavedChanges
         private set { _remainingBudget = value; OnPropertyChanged(); }
     }
 
-    public BudgetViewModel(IBudgetService budgetService)
+    public BudgetViewModel(IBudgetService budgetService, IMessageService messageService)
     {
         _budgetService = budgetService;
+        _messageService = messageService;
 
         LoadBudget();
         SaveBudgetCommand = new RelayCommand(_ => SaveBudget());
@@ -96,7 +97,7 @@ public class BudgetViewModel : BaseViewModel, IUnsavedChanges
         UpdateSpent();
 
         if (SpentThisMonth > MonthlyLimit && MonthlyLimit > 0)
-            MessageBox.Show("Current expenses exceed the new budget limit.", "Budget Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
+            _messageService.ShowWarning("Current expenses exceed the new budget limit.", "Budget Alert");
 
         BudgetSaved?.Invoke();
     }

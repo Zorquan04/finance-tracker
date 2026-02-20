@@ -3,13 +3,12 @@ using FinanceTracker.Models;
 using FinanceTracker.Services.Interfaces;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 
 namespace FinanceTracker.ViewModels;
 
-public class ExpenseViewModel : BaseViewModel, IUnsavedChanges
+public class ExpenseViewModel : BaseViewModel
 {
     public ObservableCollection<Expense> Expenses { get; set; } = new();
     public ObservableCollection<Category> Categories { get; set; } = new();
@@ -17,6 +16,7 @@ public class ExpenseViewModel : BaseViewModel, IUnsavedChanges
     public ICollectionView ExpensesView { get; }
 
     private readonly IExpenseService _expenseService;
+    private readonly IMessageService _messageService;
     private readonly ChartViewModel _chartVM;
     private readonly BudgetViewModel? _budgetVM;
 
@@ -82,9 +82,10 @@ public class ExpenseViewModel : BaseViewModel, IUnsavedChanges
     public ICommand SortByCategoryCommand { get; }
     public ICommand SortByDateCommand { get; }
 
-    public ExpenseViewModel(IExpenseService expenseService, ChartViewModel chartVM, BudgetViewModel budgetVM)
+    public ExpenseViewModel(IExpenseService expenseService, IMessageService messageService, ChartViewModel chartVM, BudgetViewModel budgetVM)
     {
         _expenseService = expenseService;
+        _messageService = messageService;
         _chartVM = chartVM;
         _budgetVM = budgetVM;
 
@@ -214,7 +215,7 @@ public class ExpenseViewModel : BaseViewModel, IUnsavedChanges
         if (_budgetVM == null) return;
 
         if (_budgetVM.SpentThisMonth > _budgetVM.MonthlyLimit && _budgetVM.MonthlyLimit > 0)
-            MessageBox.Show("Budget has been exceeded!", "Budget Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
+            _messageService.ShowWarning("Budget has been exceeded!", "Budget Alert");
     }
 
     private void RefreshView()

@@ -38,13 +38,7 @@ public partial class MainWindow : Window
 
         if (_mainVM.HasUnsavedChanges)
         {
-            var confirm = new ConfirmWindow("You have unsaved changes. Exit anyway?")
-            {
-                Owner = this,
-                WindowStartupLocation = WindowStartupLocation.CenterOwner
-            };
-
-            if (confirm.ShowDialog() != true)
+            if (!_mainVM.MessageService.Confirm("You have unsaved changes. Exit anyway?", "Unsaved Changes"))
                 e.Cancel = true;
         }
     }

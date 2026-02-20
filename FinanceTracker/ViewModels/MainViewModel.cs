@@ -13,13 +13,11 @@ public class MainViewModel : BaseViewModel
     public event Action? ShowBudgetRequested;
 
     private readonly ICsvService _csvService;
+    private readonly IMessageService _messageService;
     private readonly IExpenseService _expenseService;
     private readonly IBudgetService _budgetService;
     private readonly IChartService _chartService;
     private string? _currentFilePath;
-
-    public bool HasUnsavedChanges =>
-        (ExpensesVM as IUnsavedChanges)?.HasUnsavedChanges == true || (BudgetVM as IUnsavedChanges)?.HasUnsavedChanges == true;
 
     public RelayCommand ShowExpensesCommand { get; }
     public RelayCommand ShowChartsCommand { get; }
@@ -47,16 +45,20 @@ public class MainViewModel : BaseViewModel
         set => SetProperty(ref _isStatusVisible, value);
     }
 
-    public MainViewModel(ICsvService csvService, IExpenseService expenseService, IBudgetService budgetService, IChartService chartService)
+    public bool HasUnsavedChanges => ExpensesVM?.HasUnsavedChanges == true || BudgetVM?.HasUnsavedChanges == true;
+    public IMessageService MessageService => _messageService;
+
+    public MainViewModel(ICsvService csvService, IMessageService messageService, IExpenseService expenseService, IBudgetService budgetService, IChartService chartService)
     {
         _csvService = csvService;
+        _messageService = messageService;
         _expenseService = expenseService;
         _budgetService = budgetService;
         _chartService = chartService;
 
         ChartVM = new ChartViewModel(_chartService);
-        BudgetVM = new BudgetViewModel(_budgetService);
-        ExpensesVM = new ExpenseViewModel(_expenseService, ChartVM, BudgetVM);
+        BudgetVM = new BudgetViewModel(_budgetService, _messageService);
+        ExpensesVM = new ExpenseViewModel(_expenseService, _messageService, ChartVM, BudgetVM);
 
         ShowExpensesCommand = new RelayCommand(_ => ShowExpensesRequested?.Invoke());
         ShowChartsCommand = new RelayCommand(_ => ShowChartsRequested?.Invoke());
