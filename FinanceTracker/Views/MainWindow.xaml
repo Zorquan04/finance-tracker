@@ -6,6 +6,7 @@
         Title="Finance Tracker"
         Height="450" Width="800"
         MinHeight="450" MinWidth="800"
+        Background="{DynamicResource AppBackground}"
         WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <DataTemplate DataType="{x:Type vm:ChartViewModel}">
@@ -25,6 +26,17 @@
                 <MenuItem Header="Save _As" Command="{Binding SaveAsCommand}" />
                 <Separator/>
                 <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
+            </MenuItem>
+            
+            <MenuItem Header="_Settings">
+                <MenuItem Header="Change _Theme" Command="{Binding ChangeThemeCommand}" />
+                <MenuItem Header="Change _Language" Command="{Binding ChangeLanguageCommand}" />
+                <MenuItem Header="_Clear Data" Command="{Binding ClearDataCommand}" />
+            </MenuItem>
+
+            <MenuItem Header="_Help">
+                <MenuItem Header="_About" Command="{Binding ShowAboutCommand}" />
+                <MenuItem Header="_User Guide" Command="{Binding OpenUserGuideCommand}" />
             </MenuItem>
         </Menu>
 

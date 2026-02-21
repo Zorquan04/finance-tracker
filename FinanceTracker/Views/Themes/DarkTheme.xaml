@@ -1,0 +1,96 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Color x:Key="BackgroundColor">#252526</Color>
+	<Color x:Key="ForegroundColor">#EAEAEA</Color>
+    <Color x:Key="AccentColor">#C0C0C0</Color>
+
+    <Color x:Key="SurfaceColor">#2D2D30</Color>
+    <Color x:Key="HeaderColor">#333337</Color>
+	<Color x:Key="RowHoverColor">#333337</Color>
+	<Color x:Key="RowSelectedColor">#3A3F44</Color>
+
+	<SolidColorBrush x:Key="AppBackground" Color="{StaticResource BackgroundColor}" />
+	<SolidColorBrush x:Key="AppForeground" Color="{StaticResource ForegroundColor}" />
+	<SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}" />
+
+	<SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}" />
+	<SolidColorBrush x:Key="HeaderBrush" Color="{StaticResource HeaderColor}" />
+	<SolidColorBrush x:Key="RowHoverBrush" Color="{StaticResource RowHoverColor}" />
+	<SolidColorBrush x:Key="RowSelectedBrush" Color="{StaticResource RowSelectedColor}" />
+
+	<Style TargetType="Window">
+		<Setter Property="Background" Value="{StaticResource AppBackground}" />
+		<Setter Property="Foreground" Value="{StaticResource AppForeground}" />
+	</Style>
+
+	<Style TargetType="Grid">
+		<Setter Property="Background" Value="{StaticResource AppBackground}" />
+	</Style>
+
+	<Style TargetType="TextBlock">
+		<Setter Property="Foreground" Value="{StaticResource AppForeground}" />
+	</Style>
+
+	<Style TargetType="Button">
+		<Setter Property="Background" Value="{StaticResource AccentBrush}" />
+		<Setter Property="Foreground" Value="White"/>
+		<Setter Property="Padding" Value="8,4"/>
+		<Setter Property="Margin" Value="5"/>
+        <Setter Property="BorderThickness" Value="0"/>
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+	<Style TargetType="DataGrid">
+		<Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+		<Setter Property="RowBackground" Value="{StaticResource SurfaceBrush}"/>
+		<Setter Property="AlternatingRowBackground" Value="{StaticResource BackgroundColor}"/>
+		<Setter Property="GridLinesVisibility" Value="None"/>
+		<Setter Property="BorderThickness" Value="0"/>
+	</Style>
+
+	<Style TargetType="DataGridColumnHeader">
+		<Setter Property="Background" Value="{StaticResource HeaderBrush}"/>
+		<Setter Property="Foreground" Value="{StaticResource AppForeground}"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Height" Value="30"/>
+    </Style>
+
+	<Style TargetType="DataGridRow">
+		<Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+
+		<Style.Triggers>
+			<Trigger Property="IsMouseOver" Value="True">
+				<Setter Property="Background" Value="{StaticResource RowHoverBrush}"/>
+			</Trigger>
+			<Trigger Property="IsSelected" Value="True">
+				<Setter Property="Background" Value="{StaticResource RowSelectedBrush}"/>
+			</Trigger>
+		</Style.Triggers>
+	</Style>
+
+    <Style TargetType="Menu">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource AppForeground}" />
+    </Style>
+
+    <Style TargetType="MenuItem">
+        <Setter Property="Foreground" Value="{StaticResource AppForeground}" />
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+
+        <Style.Triggers>
+            <Trigger Property="IsHighlighted" Value="True">
+                <Setter Property="Background" Value="{StaticResource RowHoverBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+</ResourceDictionary>

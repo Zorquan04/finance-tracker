@@ -33,6 +33,7 @@ public partial class App : Application
         services.AddSingleton<IChartService, ChartService>();
         services.AddSingleton<ICsvService, CsvService>();
         services.AddSingleton<IMessageService, MessageService>();
+        services.AddSingleton<IThemeService, ThemeService>();
 
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<MainWindow>();
