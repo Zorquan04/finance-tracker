@@ -41,49 +41,7 @@
 
             <Border CornerRadius="8" BorderThickness="6" BorderBrush="#555" Background="#222" Height="30" VerticalAlignment="Bottom">
                 <Grid>
-                    <ProgressBar Height="30" Minimum="0" Maximum="100" Value="{Binding UsedPercentage, Mode=OneWay}" VerticalAlignment="Bottom" Background="Transparent">
-                        <ProgressBar.Resources>
-                            <LinearGradientBrush x:Key="GreenBrush" StartPoint="0,0" EndPoint="1,0">
-                                <GradientStop Color="#4CAF50" Offset="0"/>
-                                <GradientStop Color="#81C784" Offset="0.5"/>
-                                <GradientStop Color="#4CAF50" Offset="1"/>
-                                <LinearGradientBrush.RelativeTransform>
-                                    <TranslateTransform X="-1"/>
-                                </LinearGradientBrush.RelativeTransform>
-                            </LinearGradientBrush>
-
-                            <LinearGradientBrush x:Key="RedBrush" StartPoint="0,0" EndPoint="1,0">
-                                <GradientStop Color="#E53935" Offset="0"/>
-                                <GradientStop Color="#FF8A80" Offset="0.5"/>
-                                <GradientStop Color="#E53935" Offset="1"/>
-                                <LinearGradientBrush.RelativeTransform>
-                                    <TranslateTransform X="-1"/>
-                                </LinearGradientBrush.RelativeTransform>
-                            </LinearGradientBrush>
-                        </ProgressBar.Resources>
-
-                        <ProgressBar.Style>
-                            <Style TargetType="ProgressBar">
-                                <Setter Property="Foreground" Value="{StaticResource GreenBrush}" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsOverBudget}" Value="True">
-                                        <Setter Property="Foreground" Value="{StaticResource RedBrush}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ProgressBar.Style>
-
-                        <ProgressBar.Triggers>
-                            <EventTrigger RoutedEvent="FrameworkElement.Loaded">
-                                <BeginStoryboard>
-                                    <Storyboard RepeatBehavior="Forever">
-                                        <DoubleAnimation Storyboard.TargetProperty="Foreground.(LinearGradientBrush.RelativeTransform).(TranslateTransform.X)" From="-1" To="1" Duration="0:0:2"/>
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </EventTrigger>
-                        </ProgressBar.Triggers>
-                    </ProgressBar>
-
+                    <ProgressBar Height="30" Minimum="0" Maximum="100" Value="{Binding UsedPercentage, Mode=OneWay}" VerticalAlignment="Bottom" Foreground="{Binding ProgressBrush}" Background="#222" />
                     <TextBlock Text="{Binding UsedPercentage, StringFormat={}{0:F0}%}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="White"/>
                 </Grid>
             </Border>
