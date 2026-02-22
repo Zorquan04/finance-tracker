@@ -1,5 +1,6 @@
 ﻿using FinanceTracker.Helpers;
 using FinanceTracker.Models;
+using FinanceTracker.Resources;
 using FinanceTracker.Services.Interfaces;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -66,8 +67,8 @@ public class ExpenseViewModel : BaseViewModel
         }
     }
     public bool FiltersVisible { get => _filtersVisible; set => SetProperty(ref _filtersVisible, value); }
-    public string AddButtonText => IsEditing ? "Save" : "Add";
-    public string EditButtonText => IsEditing ? "Cancel" : "Edit";
+    public string AddButtonText => IsEditing ? AppResources.Button_Save : AppResources.Button_Add;
+    public string EditButtonText => IsEditing ? AppResources.Button_Cancel : AppResources.Button_Edit;
     public bool HasUnsavedChanges => IsEditing || !string.IsNullOrWhiteSpace(Name) || Amount > 0;
 
     public ICommand AddExpenseCommand { get; }
@@ -103,10 +104,10 @@ public class ExpenseViewModel : BaseViewModel
         MoveDownCommand = new RelayCommand(_ => SwapOrder(false), _ => SelectedExpense != null);
         ToggleFiltersCommand = new RelayCommand(_ => FiltersVisible = !FiltersVisible);
         ClearDateRangeCommand = new RelayCommand(_ => { StartDate = null; EndDate = null; });
-        SortByNameCommand = new RelayCommand(_ => SortBy(e => e.Name, "Name"));
-        SortByAmountCommand = new RelayCommand(_ => SortBy(e => e.Amount, "Amount"));
-        SortByCategoryCommand = new RelayCommand(_ => SortBy(e => e.Category?.Name ?? "", "Category"));
-        SortByDateCommand = new RelayCommand(_ => SortBy(e => e.Date, "Date"));
+        SortByNameCommand = new RelayCommand(_ => SortBy(e => e.Name, AppResources.Header_Name));
+        SortByAmountCommand = new RelayCommand(_ => SortBy(e => e.Amount, AppResources.Header_Amount));
+        SortByCategoryCommand = new RelayCommand(_ => SortBy(e => e.Category?.DisplayName ?? "", AppResources.Header_Category));
+        SortByDateCommand = new RelayCommand(_ => SortBy(e => e.Date, AppResources.Header_Date));
 
         SelectedCategory = Categories.LastOrDefault();
         SelectedFilterCategory = FilterCategories.FirstOrDefault();
@@ -215,7 +216,7 @@ public class ExpenseViewModel : BaseViewModel
         if (_budgetVM == null) return;
 
         if (_budgetVM.SpentThisMonth > _budgetVM.MonthlyLimit && _budgetVM.MonthlyLimit > 0)
-            _messageService.ShowWarning("Budget has been exceeded!", "Budget Alert");
+            _messageService.ShowWarning(AppResources.Dialog_BudgetAlertMessage, AppResources.DialogBudgedAlertTitle);
     }
 
     private void RefreshView()

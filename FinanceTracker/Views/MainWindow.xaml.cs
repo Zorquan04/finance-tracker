@@ -1,4 +1,5 @@
 ﻿using FinanceTracker.ViewModels;
+using FinanceTracker.Resources;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
@@ -38,7 +39,7 @@ public partial class MainWindow : Window
 
         if (_mainVM.HasUnsavedChanges)
         {
-            if (!_mainVM.MessageService.Confirm("You have unsaved changes. Exit anyway?", "Unsaved Changes"))
+            if (!_mainVM.MessageService.Confirm(AppResources.Dialog_UnsavedChangesMessage, AppResources.Dialog_UnsavedChangesTitle))
                 e.Cancel = true;
         }
     }

@@ -1,5 +1,6 @@
 ﻿using FinanceTracker.Helpers;
 using FinanceTracker.Models;
+using FinanceTracker.Resources;
 using FinanceTracker.Services.Interfaces;
 using System.Windows.Input;
 
@@ -97,7 +98,7 @@ public class BudgetViewModel : BaseViewModel
         UpdateSpent();
 
         if (SpentThisMonth > MonthlyLimit && MonthlyLimit > 0)
-            _messageService.ShowWarning("Current expenses exceed the new budget limit.", "Budget Alert");
+            _messageService.ShowWarning(AppResources.Dialog_BudgetAlert2Message, AppResources.Dialog_BudgetAlert2Title);
 
         BudgetSaved?.Invoke();
     }

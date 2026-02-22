@@ -1,5 +1,4 @@
-﻿using FinanceTracker.ViewModels;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
 namespace FinanceTracker.Views;
 

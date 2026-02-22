@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:v="clr-namespace:FinanceTracker.Views"
         xmlns:vm="clr-namespace:FinanceTracker.ViewModels"
+        xmlns:res="clr-namespace:FinanceTracker.Resources"
         Title="Finance Tracker"
         Height="450" Width="800"
         MinHeight="450" MinWidth="800"
@@ -20,23 +21,23 @@
 
     <DockPanel>
         <Menu DockPanel.Dock="Top">
-            <MenuItem Header="_File">
-                <MenuItem Header="_Open" Command="{Binding OpenCommand}" />
-                <MenuItem Header="_Save" Command="{Binding SaveCommand}" />
-                <MenuItem Header="Save _As" Command="{Binding SaveAsCommand}" />
+            <MenuItem Header="{x:Static res:AppResources.Menu_File}">
+                <MenuItem Header="{x:Static res:AppResources.Menu_Open}" Command="{Binding OpenCommand}" />
+                <MenuItem Header="{x:Static res:AppResources.Menu_Save}" Command="{Binding SaveCommand}" />
+                <MenuItem Header="{x:Static res:AppResources.Menu_SaveAs}" Command="{Binding SaveAsCommand}" />
                 <Separator/>
-                <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
-            </MenuItem>
-            
-            <MenuItem Header="_Settings">
-                <MenuItem Header="Change _Theme" Command="{Binding ChangeThemeCommand}" />
-                <MenuItem Header="Change _Language" Command="{Binding ChangeLanguageCommand}" />
-                <MenuItem Header="_Clear Data" Command="{Binding ClearDataCommand}" />
+                <MenuItem Header="{x:Static res:AppResources.Menu_Exit}" Command="{Binding ExitCommand}" />
             </MenuItem>
 
-            <MenuItem Header="_Help">
-                <MenuItem Header="_About" Command="{Binding ShowAboutCommand}" />
-                <MenuItem Header="_User Guide" Command="{Binding OpenUserGuideCommand}" />
+            <MenuItem Header="{x:Static res:AppResources.Menu_Settings}">
+                <MenuItem Header="{x:Static res:AppResources.Menu_ChangeTheme}" Command="{Binding ChangeThemeCommand}" />
+                <MenuItem Header="{x:Static res:AppResources.Menu_ChangeLanguage}" Command="{Binding ChangeLanguageCommand}" />
+                <MenuItem Header="{x:Static res:AppResources.Menu_ClearData}" Command="{Binding ClearDataCommand}" />
+            </MenuItem>
+
+            <MenuItem Header="{x:Static res:AppResources.Menu_Help}">
+                <MenuItem Header="{x:Static res:AppResources.Menu_About}" Command="{Binding ShowAboutCommand}" />
+                <MenuItem Header="{x:Static res:AppResources.Menu_UserGuide}" Command="{Binding OpenUserGuideCommand}" />
             </MenuItem>
         </Menu>
 
@@ -74,9 +75,9 @@
             <StackPanel Grid.Row="1"
                 Orientation="Horizontal"
                 HorizontalAlignment="Center">
-                <Button Content="Expenses" Width="120" Margin="5" Command="{Binding ShowExpensesCommand}"/>
-                <Button Content="Charts" Width="120" Margin="5" Command="{Binding ShowChartsCommand}"/>
-                <Button Content="Budget" Width="120" Margin="5" Command="{Binding ShowBudgetCommand}"/>
+                <Button Content="{x:Static res:AppResources.Button_Expenses}" Width="120" Margin="5" Command="{Binding ShowExpensesCommand}"/>
+                <Button Content="{x:Static res:AppResources.Button_Charts}" Width="120" Margin="5" Command="{Binding ShowChartsCommand}"/>
+                <Button Content="{x:Static res:AppResources.Button_Budget}" Width="120" Margin="5" Command="{Binding ShowBudgetCommand}"/>
             </StackPanel>
         </Grid>
 

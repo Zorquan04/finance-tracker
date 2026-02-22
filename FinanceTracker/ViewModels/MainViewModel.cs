@@ -1,9 +1,9 @@
 ﻿using FinanceTracker.Helpers;
 using FinanceTracker.Models;
 using FinanceTracker.Services.Interfaces;
+using FinanceTracker.Resources;
 using Microsoft.Win32;
 using System.Diagnostics;
-using System.Globalization;
 using System.Windows;
 
 namespace FinanceTracker.ViewModels;
@@ -16,7 +16,6 @@ public class MainViewModel : BaseViewModel
 
     private readonly ICsvService _csvService;
     private readonly IMessageService _messageService;
-    private readonly IThemeService _themeService;
     private readonly IExpenseService _expenseService;
     private readonly IBudgetService _budgetService;
     private readonly IChartService _chartService;
@@ -56,11 +55,10 @@ public class MainViewModel : BaseViewModel
     public bool HasUnsavedChanges => ExpensesVM?.HasUnsavedChanges == true || BudgetVM?.HasUnsavedChanges == true;
     public IMessageService MessageService => _messageService;
 
-    public MainViewModel(ICsvService csvService, IMessageService messageService, IThemeService themeService, IExpenseService expenseService, IBudgetService budgetService, IChartService chartService)
+    public MainViewModel(ICsvService csvService, IMessageService messageService, IExpenseService expenseService, IBudgetService budgetService, IChartService chartService)
     {
         _csvService = csvService;
         _messageService = messageService;
-        _themeService = themeService;
         _expenseService = expenseService;
         _budgetService = budgetService;
         _chartService = chartService;
@@ -85,7 +83,7 @@ public class MainViewModel : BaseViewModel
         ShowAboutCommand = new RelayCommand(_ => ShowAbout());
         OpenUserGuideCommand = new RelayCommand(_ => OpenUserGuide());
 
-        BudgetVM.BudgetSaved += () => ShowSuccess("Saved changes");
+        BudgetVM.BudgetSaved += () => ShowSuccess(AppResources.Title_ChangesSaved);
     }
 
     private void Save()
@@ -133,8 +131,7 @@ public class MainViewModel : BaseViewModel
             if (string.IsNullOrWhiteSpace(categoryName))
                 continue;
 
-            var existingCategory = existingCategories
-                .FirstOrDefault(c => c.Name == categoryName);
+            var existingCategory = existingCategories.FirstOrDefault(c => c.Name == categoryName);
 
             if (existingCategory == null)
             {
@@ -176,12 +173,12 @@ public class MainViewModel : BaseViewModel
 
         _csvService.Export(path, expenses, limit);
 
-        ShowSuccess("Saved changes");
+        ShowSuccess(AppResources.Title_ChangesSaved);
     }
 
     private void ClearData()
     {
-        if (!_messageService.Confirm("This will permanently delete all expenses. Continue?", "Clear Data"))
+        if (!_messageService.Confirm(AppResources.Dialog_ClearDataMessage, AppResources.Dialog_ClearDataTitle))
             return;
 
         _expenseService.ClearAllExpenses();
@@ -190,35 +187,37 @@ public class MainViewModel : BaseViewModel
         ChartVM.Refresh();
         BudgetVM.Reload();
 
-        ShowSuccess("All data cleared");
+        ShowSuccess(AppResources.TItle_AllDataCleared);
     }
 
     private void ChangeTheme()
     {
-       _themeService.ToggleTheme();
-    }
-
-    private void ChangeLanguage()
-    {
-        var confirmed = _messageService.Confirm("Switch language? Application will restart.", "Language");
+        var confirmed = _messageService.Confirm(AppResources.Dialog_ChangeThemeMessege, AppResources.Dialog_ChangeThemeTitle);
 
         if (!confirmed)
             return;
 
-        var newCulture = Thread.CurrentThread.CurrentCulture.Name == "en-GB" ? "pl-PL" : "en-GB";
+        var newTheme = Properties.Settings.Default.Theme == "Light" ? "Dark" : "Light";
 
-        var exePath = Process.GetCurrentProcess().MainModule!.FileName!;
+        Properties.Settings.Default.Theme = newTheme;
+        Properties.Settings.Default.Save();
 
-        Thread.CurrentThread.CurrentCulture = new CultureInfo(newCulture);
-        Thread.CurrentThread.CurrentUICulture = new CultureInfo(newCulture);
+        RestartApplication();
+    }
 
-        Process.Start(new ProcessStartInfo
-        {
-            FileName = exePath,
-            UseShellExecute = true
-        });
+    private void ChangeLanguage()
+    {
+        var confirmed = _messageService.Confirm(AppResources.Dialog_ChangeLanguageMessage, AppResources.Dialog_ChangeLanguageTitle);
 
-        Application.Current.Shutdown();
+        if (!confirmed)
+            return;
+
+        var newLang = Properties.Settings.Default.Language == "en-GB" ? "pl-PL" : "en-GB";
+
+        Properties.Settings.Default.Language = newLang;
+        Properties.Settings.Default.Save();
+
+        RestartApplication();
     }
 
     private void ShowAbout()
@@ -238,6 +237,19 @@ public class MainViewModel : BaseViewModel
             FileName = "https://github.com/Zorquan04/finance-tracker",
             UseShellExecute = true
         });
+    }
+
+    private void RestartApplication()
+    {
+        var exePath = Process.GetCurrentProcess().MainModule!.FileName!;
+
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = exePath,
+            UseShellExecute = true
+        });
+
+        Application.Current.Shutdown();
     }
 
     public async void ShowSuccess(string message)

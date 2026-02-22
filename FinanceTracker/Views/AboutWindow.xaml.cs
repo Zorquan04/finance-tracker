@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using FinanceTracker.Resources;
+using System.Diagnostics;
 using System.Reflection;
 using System.Windows;
 
@@ -15,7 +16,7 @@ namespace FinanceTracker.Views
         private void SetVersionText()
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version;
-            VersionText.Text = $"Version {version?.Major}.{version?.Minor}.{version?.Build}";
+            VersionText.Text = $"{AppResources.Title_Version} {version?.Major}.{version?.Minor}.{version?.Build}";
         }
 
         private void OpenGitHub_Click(object sender, RoutedEventArgs e)

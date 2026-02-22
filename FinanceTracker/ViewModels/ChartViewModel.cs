@@ -1,4 +1,5 @@
 ﻿using FinanceTracker.Services.Interfaces;
+using FinanceTracker.Resources;
 using LiveCharts;
 using LiveCharts.Wpf;
 
@@ -31,7 +32,7 @@ public class ChartViewModel : BaseViewModel
         {
             new ColumnSeries
             {
-                Title = "Expenses",
+                Title = AppResources.Title_Expenses,
                 Values = new ChartValues<decimal>(data.Select(d => d.Total))
             }
         };

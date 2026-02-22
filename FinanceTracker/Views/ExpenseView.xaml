@@ -2,7 +2,8 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
-             xmlns:vm="clr-namespace:FinanceTracker.ViewModels">
+             xmlns:vm="clr-namespace:FinanceTracker.ViewModels"
+             xmlns:res="clr-namespace:FinanceTracker.Resources">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </UserControl.Resources>
@@ -17,20 +18,20 @@
         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
             <TextBox Width="120" Margin="5" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
             <TextBox Width="80" Margin="5" Text="{Binding Amount, UpdateSourceTrigger=PropertyChanged,StringFormat=F2}" />
-            <ComboBox Width="120" Margin="5" ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory}" DisplayMemberPath="Name" />
+            <ComboBox Width="120" Margin="5" ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory}" DisplayMemberPath="DisplayName" />
             <DatePicker Width="140" Margin="5" SelectedDate="{Binding Date, Mode=TwoWay}" DisplayDateEnd="{x:Static sys:DateTime.Now}" />
             <Button Width="100" Height="25" Content="{Binding AddButtonText}" Command="{Binding AddExpenseCommand}" Margin="10,0,0,0"/>
         </StackPanel>
 
-        <Button Width="120" Height="25" Content="Show filters" Command="{Binding ToggleFiltersCommand}" HorizontalAlignment="Right" Margin="0,0,0,10"/>
+        <Button Width="120" Height="25" Content="{x:Static res:AppResources.Button_ShowFilters}" Command="{Binding ToggleFiltersCommand}" HorizontalAlignment="Right" Margin="0,0,0,10"/>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,10,0,10" Visibility="{Binding FiltersVisible, Converter={StaticResource BoolToVis}}">
-            <ComboBox Width="120" ItemsSource="{Binding FilterCategories}" SelectedItem="{Binding SelectedFilterCategory}" DisplayMemberPath="Name" />
+            <ComboBox Width="120" ItemsSource="{Binding FilterCategories}" SelectedItem="{Binding SelectedFilterCategory}" DisplayMemberPath="DisplayName" />
             <DatePicker Width="120" SelectedDate="{Binding StartDate, Mode=TwoWay}" DisplayDateEnd="{x:Static sys:DateTime.Now}" Margin="10,0,0,0" />
             <TextBlock VerticalAlignment="Center" Margin="5,0">—</TextBlock>
             <DatePicker Width="120" SelectedDate="{Binding EndDate, Mode=TwoWay}" DisplayDateEnd="{x:Static sys:DateTime.Now}" Margin="0,0,5,0" />
-            <Button Content="Clear" Margin="5,0,0,0" Command="{Binding ClearDateRangeCommand}" />
-            <TextBlock Margin="20,0,0,0" VerticalAlignment="Center" FontWeight="Bold" Text="{Binding TotalExpenses, StringFormat=Total: {0:N2} zł}" />
+            <Button Content="{x:Static res:AppResources.Button_Clear}" Margin="5,0,0,0" Command="{Binding ClearDateRangeCommand}" />
+            <TextBlock Margin="20,0,0,0" VerticalAlignment="Center" FontWeight="Bold" Text="{Binding TotalExpenses, StringFormat={x:Static res:AppResources.Title_Total}}" />
         </StackPanel>
 
         <Grid Grid.Row="2">
@@ -43,10 +44,10 @@
                       GridLinesVisibility="None" RowBackground="#C0C0C0" AlternatingRowBackground="#808080" HeadersVisibility="Column" RowHeight="28" FontSize="14">
 
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
-                    <DataGridTextColumn Header="Amount" Binding="{Binding Amount, StringFormat=F2}" Width="*"/>
-                    <DataGridTextColumn Header="Category" Binding="{Binding Category.Name}" Width="*"/>
-                    <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=dd/MM/yyyy}" Width="*"/>
+                    <DataGridTextColumn Header="{x:Static res:AppResources.Header_Name}" Binding="{Binding Name}" Width="*"/>
+                    <DataGridTextColumn Header="{x:Static res:AppResources.Header_Amount}" Binding="{Binding Amount, StringFormat=F2}" Width="*"/>
+                    <DataGridTextColumn Header="{x:Static res:AppResources.Header_Category}" Binding="{Binding Category.DisplayName}" Width="*"/>
+                    <DataGridTextColumn Header="{x:Static res:AppResources.Header_Date}" Binding="{Binding Date, StringFormat=dd/MM/yyyy}" Width="*"/>
                 </DataGrid.Columns>
             </DataGrid>
 
@@ -57,16 +58,16 @@
                     </Style>
                 </StackPanel.Resources>
 
-                <Button Content="Sort Name" Command="{Binding SortByNameCommand}" />
-                <Button Content="Sort Amount" Command="{Binding SortByAmountCommand}" />
-                <Button Content="Sort Category" Command="{Binding SortByCategoryCommand}" />
-                <Button Content="Sort Date" Command="{Binding SortByDateCommand}" />
+                <Button Content="{x:Static res:AppResources.Button_SortName}" Command="{Binding SortByNameCommand}" />
+                <Button Content="{x:Static res:AppResources.Button_SortAmount}" Command="{Binding SortByAmountCommand}" />
+                <Button Content="{x:Static res:AppResources.Button_SortCategory}" Command="{Binding SortByCategoryCommand}" />
+                <Button Content="{x:Static res:AppResources.Button_SortDate}" Command="{Binding SortByDateCommand}" />
 
-                <Button Content="Up" Command="{Binding MoveUpCommand}" />
-                <Button Content="Down" Command="{Binding MoveDownCommand}" />
+                <Button Content="{x:Static res:AppResources.Button_Up}" Command="{Binding MoveUpCommand}" />
+                <Button Content="{x:Static res:AppResources.Button_Down}" Command="{Binding MoveDownCommand}" />
 
                 <Button Content="{Binding EditButtonText}" Command="{Binding EditCommand}" />
-                <Button Content="Delete" Command="{Binding DeleteCommand}" />
+                <Button Content="{x:Static res:AppResources.Button_Delete}" Command="{Binding DeleteCommand}" />
             </StackPanel>
         </Grid>
     </Grid>

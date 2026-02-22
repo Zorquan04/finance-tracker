@@ -16,6 +16,6 @@ public class ChartService : IChartService
     public IEnumerable<(string Category, decimal Total)> GetExpensesByCategory()
     {
         var expenses = _context.Expenses.Include(e => e.Category).AsNoTracking().ToList();
-        return expenses.GroupBy(e => e.Category!.Name!).Select(g => (Category: g.Key, Total: g.Sum(e => e.Amount))).ToList();
+        return expenses.GroupBy(e => e.Category!.DisplayName!).Select(g => (Category: g.Key, Total: g.Sum(e => e.Amount))).ToList();
     }
 }
