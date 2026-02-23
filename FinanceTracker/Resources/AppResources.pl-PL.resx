@@ -315,4 +315,31 @@
   <data name="Title_Yes" xml:space="preserve">
     <value>Tak</value>
   </data>
+  <data name="Tooltip_About" xml:space="preserve">
+    <value>Wyświetl informacje o aplikacji</value>
+  </data>
+  <data name="Tooltip_ChangeLanguage" xml:space="preserve">
+    <value>Przełączanie między językiem angielskim i polskim</value>
+  </data>
+  <data name="Tooltip_ClearData" xml:space="preserve">
+    <value>Trwałe usunięcie wszystkich danych</value>
+  </data>
+  <data name="Tooltip_Exit" xml:space="preserve">
+    <value>Zamknij aplikację</value>
+  </data>
+  <data name="Tooltip_Open" xml:space="preserve">
+    <value>Otwórz plik CSV z zapisanymi wydatkami oraz budżetem</value>
+  </data>
+  <data name="Tooltip_Save" xml:space="preserve">
+    <value>Zapisz bieżące dane do pliku</value>
+  </data>
+  <data name="Tooltip_SaveAs" xml:space="preserve">
+    <value>Zapisz bieżące dane do nowego pliku</value>
+  </data>
+  <data name="Tooltip_ChangeTheme" xml:space="preserve">
+    <value>Przełączanie między jasnym i ciemnym motywem</value>
+  </data>
+  <data name="Tooltip_UserGuide" xml:space="preserve">
+    <value>Otwórz instrukcję obsługi</value>
+  </data>
 </root>

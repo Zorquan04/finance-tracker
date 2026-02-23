@@ -9,6 +9,13 @@
         MinHeight="480" MinWidth="800"
         Background="{DynamicResource AppBackground}"
         WindowStartupLocation="CenterScreen">
+    <Window.InputBindings>
+        <KeyBinding Key="O" Modifiers="Control" Command="{Binding OpenCommand}" />
+        <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveCommand}" />
+        <KeyBinding Key="S" Modifiers="Control+Shift" Command="{Binding SaveAsCommand}" />
+        <KeyBinding Key="Q" Modifiers="Control" Command="{Binding ExitCommand}" />
+    </Window.InputBindings>
+
     <Window.Resources>
         <DataTemplate DataType="{x:Type vm:ChartViewModel}">
             <v:ChartView/>
@@ -22,22 +29,58 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="{x:Static res:AppResources.Menu_File}">
-                <MenuItem Header="{x:Static res:AppResources.Menu_Open}" Command="{Binding OpenCommand}" />
-                <MenuItem Header="{x:Static res:AppResources.Menu_Save}" Command="{Binding SaveCommand}" />
-                <MenuItem Header="{x:Static res:AppResources.Menu_SaveAs}" Command="{Binding SaveAsCommand}" />
+                <MenuItem Header="{x:Static res:AppResources.Menu_Open}" Command="{Binding OpenCommand}" InputGestureText="Ctrl+O" ToolTip="{x:Static res:AppResources.Tooltip_Open}">
+                    <MenuItem.Icon>
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8E5;" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{x:Static res:AppResources.Menu_Save}" Command="{Binding SaveCommand}" InputGestureText="Ctrl+S" ToolTip="{x:Static res:AppResources.Tooltip_Save}">
+                    <MenuItem.Icon>
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74E;" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{x:Static res:AppResources.Menu_SaveAs}" Command="{Binding SaveAsCommand}" InputGestureText="Ctrl+Shift+S" ToolTip="{x:Static res:AppResources.Tooltip_SaveAs}">
+                    <MenuItem.Icon>
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE7C3;" />
+                    </MenuItem.Icon>
+                </MenuItem>
                 <Separator/>
-                <MenuItem Header="{x:Static res:AppResources.Menu_Exit}" Command="{Binding ExitCommand}" />
+                <MenuItem Header="{x:Static res:AppResources.Menu_Exit}" Command="{Binding ExitCommand}" InputGestureText="Ctrl+Q" ToolTip="{x:Static res:AppResources.Tooltip_Exit}">
+                    <MenuItem.Icon>
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE711;" />
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
 
             <MenuItem Header="{x:Static res:AppResources.Menu_Settings}">
-                <MenuItem Header="{x:Static res:AppResources.Menu_ChangeTheme}" Command="{Binding ChangeThemeCommand}" />
-                <MenuItem Header="{x:Static res:AppResources.Menu_ChangeLanguage}" Command="{Binding ChangeLanguageCommand}" />
-                <MenuItem Header="{x:Static res:AppResources.Menu_ClearData}" Command="{Binding ClearDataCommand}" />
+                <MenuItem Header="{x:Static res:AppResources.Menu_ChangeTheme}" Command="{Binding ChangeThemeCommand}" ToolTip="{x:Static res:AppResources.Tooltip_ChangeTheme}">
+                    <MenuItem.Icon>
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE790;" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{x:Static res:AppResources.Menu_ChangeLanguage}" Command="{Binding ChangeLanguageCommand}" ToolTip="{x:Static res:AppResources.Tooltip_ChangeLanguage}">
+                    <MenuItem.Icon>
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE909;" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{x:Static res:AppResources.Menu_ClearData}" Command="{Binding ClearDataCommand}" ToolTip="{x:Static res:AppResources.Tooltip_ClearData}">
+                    <MenuItem.Icon>
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74D;" />
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
 
             <MenuItem Header="{x:Static res:AppResources.Menu_Help}">
-                <MenuItem Header="{x:Static res:AppResources.Menu_About}" Command="{Binding ShowAboutCommand}" />
-                <MenuItem Header="{x:Static res:AppResources.Menu_UserGuide}" Command="{Binding OpenUserGuideCommand}" />
+                <MenuItem Header="{x:Static res:AppResources.Menu_About}" Command="{Binding ShowAboutCommand}" ToolTip="{x:Static res:AppResources.Tooltip_About}">
+                    <MenuItem.Icon>
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE946;" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{x:Static res:AppResources.Menu_UserGuide}" Command="{Binding OpenUserGuideCommand}" ToolTip="{x:Static res:AppResources.Tooltip_UserGuide}">
+                    <MenuItem.Icon>
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE82D;" />
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
         </Menu>
 

@@ -653,5 +653,86 @@ namespace FinanceTracker.Resources {
                 return ResourceManager.GetString("Title_Yes", resourceCulture);
             }
         }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu View application information.
+        /// </summary>
+        public static string Tooltip_About {
+            get {
+                return ResourceManager.GetString("Tooltip_About", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Switch between english and polish language.
+        /// </summary>
+        public static string Tooltip_ChangeLanguage {
+            get {
+                return ResourceManager.GetString("Tooltip_ChangeLanguage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Switch between light and dark theme.
+        /// </summary>
+        public static string Tooltip_ChangeTheme {
+            get {
+                return ResourceManager.GetString("Tooltip_ChangeTheme", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Permanently remove all data.
+        /// </summary>
+        public static string Tooltip_ClearData {
+            get {
+                return ResourceManager.GetString("Tooltip_ClearData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Close the application.
+        /// </summary>
+        public static string Tooltip_Exit {
+            get {
+                return ResourceManager.GetString("Tooltip_Exit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Open a CSV file with saved expenses and budget.
+        /// </summary>
+        public static string Tooltip_Open {
+            get {
+                return ResourceManager.GetString("Tooltip_Open", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Save current data to file.
+        /// </summary>
+        public static string Tooltip_Save {
+            get {
+                return ResourceManager.GetString("Tooltip_Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Save current data to a new file.
+        /// </summary>
+        public static string Tooltip_SaveAs {
+            get {
+                return ResourceManager.GetString("Tooltip_SaveAs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Open the user guide.
+        /// </summary>
+        public static string Tooltip_UserGuide {
+            get {
+                return ResourceManager.GetString("Tooltip_UserGuide", resourceCulture);
+            }
+        }
     }
 }

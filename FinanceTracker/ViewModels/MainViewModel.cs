@@ -123,28 +123,22 @@ public class MainViewModel : BaseViewModel
         _expenseService.ClearAllExpenses();
 
         var existingCategories = _expenseService.GetAllCategories();
+        var otherCategory = existingCategories.First(c => c.Name == CategoryType.Other.ToString());
 
         foreach (var e in expenses)
         {
             var categoryName = e.Category?.Name;
 
-            if (string.IsNullOrWhiteSpace(categoryName))
-                continue;
+            CategoryType parsedType;
 
-            var existingCategory = existingCategories.FirstOrDefault(c => c.Name == categoryName);
+            if (!Enum.TryParse(categoryName, true, out parsedType))
+                parsedType = CategoryType.Other;
 
-            if (existingCategory == null)
-            {
-                existingCategory = new Category
-                {
-                    Name = categoryName
-                };
+            var matchedCategory = existingCategories.FirstOrDefault(c => c.Name == parsedType.ToString());
 
-                _expenseService.AddCategory(existingCategory);
-                existingCategories.Add(existingCategory);
-            }
+            var finalCategory = matchedCategory ?? otherCategory;
 
-            e.CategoryId = existingCategory.Id;
+            e.CategoryId = finalCategory.Id;
             e.Category = null;
 
             _expenseService.AddExpense(e);

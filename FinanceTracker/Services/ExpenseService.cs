@@ -32,12 +32,6 @@ public class ExpenseService : IExpenseService
         _context.SaveChanges();
     }
 
-    public void AddCategory(Category category)
-    {
-        _context.Categories.Add(category);
-        _context.SaveChanges();
-    }
-
     public void UpdateExpense(Expense expense)
     {
         var e = _context.Expenses.FirstOrDefault(x => x.Id == expense.Id);
