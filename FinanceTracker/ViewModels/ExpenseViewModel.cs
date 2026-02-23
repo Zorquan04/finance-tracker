@@ -53,7 +53,7 @@ public class ExpenseViewModel : BaseViewModel
     public DateTime? StartDate { get => _startDate; set { if (SetProperty(ref _startDate, value)) RefreshView(); } }
     public DateTime? EndDate { get => _endDate; set { if (SetProperty(ref _endDate, value)) RefreshView(); } }
     public Expense? SelectedExpense { get => _selectedExpense; set => SetProperty(ref _selectedExpense, value); }
-    
+
     public bool IsEditing
     {
         get => _isEditing;
@@ -66,6 +66,7 @@ public class ExpenseViewModel : BaseViewModel
             }
         }
     }
+
     public bool FiltersVisible { get => _filtersVisible; set => SetProperty(ref _filtersVisible, value); }
     public string AddButtonText => IsEditing ? AppResources.Button_Save : AppResources.Button_Add;
     public string EditButtonText => IsEditing ? AppResources.Button_Cancel : AppResources.Button_Edit;

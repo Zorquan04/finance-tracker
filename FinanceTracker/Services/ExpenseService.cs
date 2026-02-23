@@ -94,6 +94,7 @@ public class ExpenseService : IExpenseService
     public void ClearAllExpenses()
     {
         _context.Expenses.RemoveRange(_context.Expenses);
+        _context.MonthlyBudgets.RemoveRange(_context.MonthlyBudgets);
         _context.SaveChanges();
     }
 }

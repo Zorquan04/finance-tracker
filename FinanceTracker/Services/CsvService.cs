@@ -17,7 +17,7 @@ public class CsvService : ICsvService
 
         bool first = true;
 
-        foreach(var e in expenses)
+        foreach (var e in expenses)
         {
             var limitValue = first ? monhtlyLimit.ToString(CultureInfo.InvariantCulture) : "";
             first = false;
@@ -41,7 +41,7 @@ public class CsvService : ICsvService
         for (int i = 1; i < lines.Length; i++)
         {
             var parts = lines[i].Split(';');
-            
+
             if (parts.Length < 6)
                 continue;
 

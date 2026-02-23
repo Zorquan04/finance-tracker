@@ -1,10 +1,10 @@
 ﻿using FinanceTracker.Data;
+using FinanceTracker.Properties;
 using FinanceTracker.Services;
 using FinanceTracker.Services.Interfaces;
 using FinanceTracker.ViewModels;
 using FinanceTracker.Views;
 using Microsoft.Extensions.DependencyInjection;
-using FinanceTracker.Properties;
 using System.Globalization;
 using System.Windows;
 

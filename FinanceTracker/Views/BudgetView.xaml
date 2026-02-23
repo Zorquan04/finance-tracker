@@ -17,7 +17,8 @@
             <Button Content="{x:Static res:AppResources.Button_Save}" Width="80" Margin="10,0,0,0" Command="{Binding SaveBudgetCommand}"/>
         </StackPanel>
 
-        <Border Grid.Row="2" CornerRadius="10" BorderThickness="2" BorderBrush="#555" Background="#999" Padding="15" HorizontalAlignment="Center">
+        <Border Grid.Row="2" CornerRadius="10" BorderThickness="2" Background="{StaticResource AccentBrush}"
+        BorderBrush="{StaticResource HeaderBrush}" Padding="15" HorizontalAlignment="Center">
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,0,5">
                     <TextBlock Text="{x:Static res:AppResources.Title_SpentThisMonth}" FontWeight="Bold"/>

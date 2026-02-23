@@ -1,7 +1,7 @@
 ﻿using FinanceTracker.Helpers;
 using FinanceTracker.Models;
-using FinanceTracker.Services.Interfaces;
 using FinanceTracker.Resources;
+using FinanceTracker.Services.Interfaces;
 using Microsoft.Win32;
 using System.Diagnostics;
 using System.Windows;

@@ -11,7 +11,7 @@ namespace FinanceTracker.ViewModels;
 public class BudgetViewModel : BaseViewModel
 {
     private readonly IBudgetService _budgetService;
-    private readonly IMessageService _messageService;   
+    private readonly IMessageService _messageService;
     public ICommand SaveBudgetCommand { get; }
 
     public event Action? BudgetSaved;

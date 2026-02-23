@@ -1,5 +1,5 @@
-﻿using FinanceTracker.Services.Interfaces;
-using FinanceTracker.Resources;
+﻿using FinanceTracker.Resources;
+using FinanceTracker.Services.Interfaces;
 using LiveCharts;
 using LiveCharts.Wpf;
 

@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using FinanceTracker.Models;
+﻿using FinanceTracker.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinanceTracker.Data
 {

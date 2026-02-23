@@ -1,5 +1,5 @@
-﻿using FinanceTracker.ViewModels;
-using FinanceTracker.Resources;
+﻿using FinanceTracker.Resources;
+using FinanceTracker.ViewModels;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
