@@ -354,4 +354,10 @@
   <data name="Title_ChangeTrend" xml:space="preserve">
     <value>Change to Trend Chart:</value>
   </data>
+  <data name="Title_Date" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="Tooltip_Count" xml:space="preserve">
+    <value>Elements: {0}</value>
+  </data>
 </root>

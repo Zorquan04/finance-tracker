@@ -3,15 +3,26 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:res="clr-namespace:FinanceTracker.Resources"
              Background="{StaticResource AppBackground}">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </UserControl.Resources>
+
     <Border BorderBrush="{StaticResource AccentBrush}" BorderThickness="2" Padding="8">
 		<ItemsControl ItemsSource="{Binding DataPoints}">
 			<ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Margin="5">
-                        <TextBlock Text="{Binding ChartPoint.Instance.Category}" FontWeight="Bold" Margin="0,0,0,5" />
-                        <TextBlock Text="{Binding ChartPoint.Instance.Total, StringFormat={x:Static res:AppResources.Title_Total}}"/>
-                        <TextBlock Text="{Binding ChartPoint.Instance.Average, StringFormat={x:Static res:AppResources.Title_Average}}"/>
-                        <TextBlock Text="{Binding ChartPoint.Instance.Max, StringFormat={x:Static res:AppResources.Title_Max}}"/>
+                        <TextBlock Text="{Binding ChartPoint.Instance.Category}" FontWeight="Bold"/>
+
+                        <TextBlock Text="{Binding ChartPint.Instance.Count, StringFormat='{x:Static res:AppResources.Tooltip_Count}'}" 
+                                   Visibility="{Binding DataContext.IsTrendMode, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}" />
+
+                        <TextBlock Text="{Binding ChartPoint.Instance.Total, StringFormat={x:Static res:AppResources.Title_Total}}" 
+                                   Visibility="{Binding DataContext.IsTrendMode, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}" />
+                        <TextBlock Text="{Binding ChartPoint.Instance.Average, StringFormat={x:Static res:AppResources.Title_Average}}" 
+                                   Visibility="{Binding DataContext.IsTrendMode, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}" />
+                        <TextBlock Text="{Binding ChartPoint.Instance.Max, StringFormat={x:Static res:AppResources.Title_Max}}" 
+                                   Visibility="{Binding DataContext.IsTrendMode, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}" />
                     </StackPanel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

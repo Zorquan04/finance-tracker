@@ -1,9 +1,13 @@
 ﻿using FinanceTracker.Helpers;
 using FinanceTracker.Models;
 using FinanceTracker.Resources;
-using FinanceTracker.Services.Interfaces; 
+using FinanceTracker.Services.Interfaces;
 using LiveCharts;
+using LiveCharts.Defaults;
 using LiveCharts.Wpf;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -13,23 +17,24 @@ public class ChartViewModel : BaseViewModel
 {
     private readonly IChartService _chartService;
     private List<CategoryStats> _stats = new();
+
+    public string[]? ColumnLabels { get; set; }
+    public string[]? TrendLabels { get; set; }
+
+    public bool IsTrendMode { get; set; }
     public ICommand ToggleChartCommand { get; }
     public string ToggleChartText => IsTrendMode ? AppResources.Title_ChangeColumn : AppResources.Title_ChangeTrend;
+    public string XAxisTitle => IsTrendMode ? AppResources.Title_Date : AppResources.Title_Category;
 
     public SeriesCollection? SeriesCollection { get; set; }
-    public bool IsTrendMode { get; set; }
-
-    public string[]? Labels { get; set; }
-
     public Func<double, string>? YFormatter { get; set; }
+    public Func<double, string>? XFormatter { get; set; }
 
     public ChartViewModel(IChartService chartService)
     {
         _chartService = chartService;
         YFormatter = value => $"{value:N2} zł";
-
         ToggleChartCommand = new RelayCommand(_ => ToggleChartMode());
-
         LoadChartData();
     }
 
@@ -44,9 +49,12 @@ public class ChartViewModel : BaseViewModel
     private void LoadColumnChart()
     {
         _stats = _chartService.GetExpensesByCategory().ToList();
-        Labels = _stats.Select(s => s.Category).ToArray();
+        ColumnLabels = _stats.Select(s => s.Category).ToArray();
 
-        var mapper = LiveCharts.Configurations.Mappers.Xy<CategoryStats>().X((value, index) => index).Y(value => (double)value.Total).Fill(value => GetColorByCategory(value.Category));
+        var mapper = LiveCharts.Configurations.Mappers.Xy<CategoryStats>()
+            .X((value, index) => index)
+            .Y(value => (double)value.Total)
+            .Fill(value => GetColorByCategory(value.Category));
 
         SeriesCollection = new SeriesCollection(mapper)
         {
@@ -59,52 +67,24 @@ public class ChartViewModel : BaseViewModel
             }
         };
 
+        XFormatter = value =>
+        {
+            int i = (int)Math.Round(value);
+            if (i >= 0 && i < ColumnLabels.Length) return ColumnLabels[i];
+            return "";
+        };
+
         OnPropertyChanged(nameof(SeriesCollection));
-        OnPropertyChanged(nameof(Labels));
+        OnPropertyChanged(nameof(XFormatter));
+        OnPropertyChanged(nameof(XAxisTitle));
     }
 
     private void LoadTrendChart()
     {
         var expenses = _chartService.GetAllExpenses();
-        var grouped = expenses.GroupBy(e => new { e.Category?.DisplayName, Month = new DateTime(e.Date.Year, e.Date.Month, 1) }).Select(g => new
-            {
-                g.Key.DisplayName,
-                g.Key.Month,
-                Total = g.Sum(e => e.Amount)
-            }).ToList();
 
-        var months = grouped.Select(g => g.Month).Distinct().OrderBy(d => d).ToList();
-
-        Labels = months.Select(m => m.ToString("MM/yyyy")).ToArray();
-
-        var categories = grouped.Select(g => g.DisplayName).Distinct();
-
-        SeriesCollection = new SeriesCollection();
-
-        foreach (var category in categories)
-        {
-            var values = new ChartValues<double>();
-
-            foreach (var month in months)
-            {
-                var value = grouped.FirstOrDefault(g => g.DisplayName == category && g.Month == month)?.Total ?? 0;
-
-                values.Add((double)value);
-            }
-
-            SeriesCollection.Add(new LineSeries
-            {
-                Title = category,
-                Values = values,
-                Stroke = GetColorByCategory(category),
-                Fill = Brushes.Transparent,
-                PointGeometrySize = 8,
-                StrokeThickness = 2
-            });
-        }
-
-        OnPropertyChanged(nameof(SeriesCollection));
-        OnPropertyChanged(nameof(Labels));
+        var grouped = expenses.GroupBy(e => new { e.Category?.DisplayName, Day = e.Date.Date }).Select(g => new { Category = g.Key.DisplayName, Day = g.Key.Day, Total = g.Sum(e => e.Amount), Count = g.Count() }).OrderBy(g => g.Day).ToList(); var categories = grouped.Select(g => g.Category).Distinct(); var allDates = grouped.Select(g => g.Day).Distinct().OrderBy(d => d).ToList(); TrendLabels = allDates.Select(d => d.ToString("dd.MM")).ToArray(); SeriesCollection = new SeriesCollection(); foreach (var category in categories) { var values = new ChartValues<CategoryDay>(); foreach (var date in allDates) { var item = grouped.FirstOrDefault(g => g.Category == category && g.Day == date); values.Add(new CategoryDay { Date = date, Total = item?.Total ?? 0, Count = item?.Count ?? 0 }); } var mapper = LiveCharts.Configurations.Mappers.Xy<CategoryDay>().X(cd => cd.Date.ToOADate()).Y(cd => (double)cd.Total); SeriesCollection.Add(new LineSeries(mapper) { Title = category, Values = values, Stroke = GetColorByCategory(category), Fill = Brushes.Transparent, PointGeometrySize = 6, StrokeThickness = 2 }); }
+        XFormatter = value => DateTime.FromOADate(value).ToString("dd.MM"); OnPropertyChanged(nameof(SeriesCollection)); OnPropertyChanged(nameof(XFormatter)); OnPropertyChanged(nameof(XAxisTitle));
     }
 
     public void ToggleChartMode()
@@ -117,15 +97,17 @@ public class ChartViewModel : BaseViewModel
 
     public Brush GetColorByCategory(string? category)
     {
-        return category switch
-        {
-            "Food" => new SolidColorBrush(Color.FromRgb(76, 175, 80)),
-            "Bills" => new SolidColorBrush(Color.FromRgb(244, 67, 54)),
-            "Entertainment" => new SolidColorBrush(Color.FromRgb(156, 39, 176)),
-            "Transport" => new SolidColorBrush(Color.FromRgb(33, 150, 243)),
-            "Other" => new SolidColorBrush(Color.FromRgb(158, 158, 158)),
-            _ => Brushes.Gray
-        };
+        if (category == AppResources.Category_Food)
+            return new SolidColorBrush(Color.FromRgb(76, 175, 80));
+        if (category == AppResources.Category_Bills)
+            return new SolidColorBrush(Color.FromRgb(244, 67, 54));
+        if (category == AppResources.Category_Entertainment)
+            return new SolidColorBrush(Color.FromRgb(156, 39, 176));
+        if (category == AppResources.Category_Transport)
+            return new SolidColorBrush(Color.FromRgb(33, 150, 243));
+        if (category == AppResources.Category_Other)
+            return new SolidColorBrush(Color.FromRgb(158, 158, 158));
+        return Brushes.Gray;
     }
 
     public void Refresh() => LoadChartData();

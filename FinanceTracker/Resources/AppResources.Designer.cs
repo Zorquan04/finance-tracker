@@ -601,6 +601,15 @@ namespace FinanceTracker.Resources {
         }
         
         /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Date.
+        /// </summary>
+        public static string Title_Date {
+            get {
+                return ResourceManager.GetString("Title_Date", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         /// Wyszukuje zlokalizowany ciąg podobny do ciągu Expenses:.
         /// </summary>
         public static string Title_Expenses {
@@ -723,6 +732,15 @@ namespace FinanceTracker.Resources {
         public static string Tooltip_ClearData {
             get {
                 return ResourceManager.GetString("Tooltip_ClearData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Elements: {0}.
+        /// </summary>
+        public static string Tooltip_Count {
+            get {
+                return ResourceManager.GetString("Tooltip_Count", resourceCulture);
             }
         }
         

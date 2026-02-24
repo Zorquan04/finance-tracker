@@ -32,7 +32,7 @@
             </lc:CartesianChart.DataTooltip>
 
             <lc:CartesianChart.AxisX>
-                <lc:Axis Title="{x:Static res:AppResources.Title_Category}" Labels="{Binding Labels}" />
+                <lc:Axis Title="{Binding XAxisTitle}" LabelFormatter="{Binding XFormatter}" />
             </lc:CartesianChart.AxisX>
 
             <lc:CartesianChart.AxisY>

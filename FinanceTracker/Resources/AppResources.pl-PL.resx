@@ -354,4 +354,10 @@
   <data name="Title_ChangeTrend" xml:space="preserve">
     <value>Zmień na wykres liniowy trendu:</value>
   </data>
+  <data name="Title_Date" xml:space="preserve">
+    <value>Data</value>
+  </data>
+  <data name="Tooltip_Count" xml:space="preserve">
+    <value>Elementy: {0}</value>
+  </data>
 </root>
