@@ -547,6 +547,15 @@ namespace FinanceTracker.Resources {
         }
         
         /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Average: {0:N2} zł.
+        /// </summary>
+        public static string Title_Average {
+            get {
+                return ResourceManager.GetString("Title_Average", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         /// Wyszukuje zlokalizowany ciąg podobny do ciągu Category.
         /// </summary>
         public static string Title_Category {
@@ -556,11 +565,29 @@ namespace FinanceTracker.Resources {
         }
         
         /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Change to Column Chart:.
+        /// </summary>
+        public static string Title_ChangeColumn {
+            get {
+                return ResourceManager.GetString("Title_ChangeColumn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         /// Wyszukuje zlokalizowany ciąg podobny do ciągu Changes Saved.
         /// </summary>
         public static string Title_ChangesSaved {
             get {
                 return ResourceManager.GetString("Title_ChangesSaved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Change to Trend Chart:.
+        /// </summary>
+        public static string Title_ChangeTrend {
+            get {
+                return ResourceManager.GetString("Title_ChangeTrend", resourceCulture);
             }
         }
         
@@ -579,6 +606,15 @@ namespace FinanceTracker.Resources {
         public static string Title_Expenses {
             get {
                 return ResourceManager.GetString("Title_Expenses", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Max: {0:N2} zł.
+        /// </summary>
+        public static string Title_Max {
+            get {
+                return ResourceManager.GetString("Title_Max", resourceCulture);
             }
         }
         

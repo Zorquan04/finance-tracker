@@ -1,0 +1,20 @@
+<UserControl x:Class="FinanceTracker.Views.CustomChartTooltip"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:res="clr-namespace:FinanceTracker.Resources"
+             Background="{StaticResource AppBackground}">
+    <Border BorderBrush="{StaticResource AccentBrush}" BorderThickness="2" Padding="8">
+		<ItemsControl ItemsSource="{Binding DataPoints}">
+			<ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Margin="5">
+                        <TextBlock Text="{Binding ChartPoint.Instance.Category}" FontWeight="Bold" Margin="0,0,0,5" />
+                        <TextBlock Text="{Binding ChartPoint.Instance.Total, StringFormat={x:Static res:AppResources.Title_Total}}"/>
+                        <TextBlock Text="{Binding ChartPoint.Instance.Average, StringFormat={x:Static res:AppResources.Title_Average}}"/>
+                        <TextBlock Text="{Binding ChartPoint.Instance.Max, StringFormat={x:Static res:AppResources.Title_Max}}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Border>
+</UserControl>

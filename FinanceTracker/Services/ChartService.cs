@@ -1,4 +1,5 @@
 ﻿using FinanceTracker.Data;
+using FinanceTracker.Models;
 using FinanceTracker.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,9 +14,21 @@ public class ChartService : IChartService
         _context = context;
     }
 
-    public IEnumerable<(string Category, decimal Total)> GetExpensesByCategory()
+    public IEnumerable<CategoryStats> GetExpensesByCategory()
     {
         var expenses = _context.Expenses.Include(e => e.Category).AsNoTracking().ToList();
-        return expenses.GroupBy(e => e.Category!.DisplayName!).Select(g => (Category: g.Key, Total: g.Sum(e => e.Amount))).ToList();
+
+        return expenses.GroupBy(e => e.Category!.DisplayName!).Select(g => new CategoryStats
+        {
+            Category = g.Key,
+            Total = g.Sum(e => e.Amount),
+            Average = g.Average(e => e.Amount),
+            Max = g.Max(e => e.Amount)
+        }).ToList();
+    }
+
+    public IEnumerable<Expense> GetAllExpenses()
+    {
+        return _context.Expenses.Include(e => e.Category).AsNoTracking().ToList();
     }
 }

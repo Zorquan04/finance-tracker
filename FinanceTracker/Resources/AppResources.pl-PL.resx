@@ -342,4 +342,16 @@
   <data name="Tooltip_UserGuide" xml:space="preserve">
     <value>Otwórz instrukcję obsługi</value>
   </data>
+  <data name="Title_Average" xml:space="preserve">
+    <value>Średnio: {0:N2} zł</value>
+  </data>
+  <data name="Title_Max" xml:space="preserve">
+    <value>Maks: {0:N2} zł</value>
+  </data>
+  <data name="Title_ChangeColumn" xml:space="preserve">
+    <value>Zmień na wykres słupkowy:</value>
+  </data>
+  <data name="Title_ChangeTrend" xml:space="preserve">
+    <value>Zmień na wykres liniowy trendu:</value>
+  </data>
 </root>

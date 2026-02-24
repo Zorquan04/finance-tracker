@@ -342,4 +342,16 @@
   <data name="Tooltip_UserGuide" xml:space="preserve">
     <value>Open the user guide</value>
   </data>
+  <data name="Title_Average" xml:space="preserve">
+    <value>Average: {0:N2} zł</value>
+  </data>
+  <data name="Title_Max" xml:space="preserve">
+    <value>Max: {0:N2} zł</value>
+  </data>
+  <data name="Title_ChangeColumn" xml:space="preserve">
+    <value>Change to Column Chart:</value>
+  </data>
+  <data name="Title_ChangeTrend" xml:space="preserve">
+    <value>Change to Trend Chart:</value>
+  </data>
 </root>

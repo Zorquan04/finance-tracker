@@ -1,6 +1,9 @@
-﻿namespace FinanceTracker.Services.Interfaces;
+﻿using FinanceTracker.Models;
+
+namespace FinanceTracker.Services.Interfaces;
 
 public interface IChartService
 {
-    IEnumerable<(string Category, decimal Total)> GetExpensesByCategory();
+    IEnumerable<CategoryStats> GetExpensesByCategory();
+    IEnumerable<Expense> GetAllExpenses();
 }
