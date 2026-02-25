@@ -28,7 +28,7 @@
 
         <lc:CartesianChart Grid.Row="1" Series="{Binding SeriesCollection}">
             <lc:CartesianChart.DataTooltip>
-                <views:CustomChartTooltip />
+                <views:CustomChartTooltip IsTrendMode="{Binding IsTrendMode}" />
             </lc:CartesianChart.DataTooltip>
 
             <lc:CartesianChart.AxisX>

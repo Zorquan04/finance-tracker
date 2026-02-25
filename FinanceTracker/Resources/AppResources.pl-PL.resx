@@ -357,7 +357,7 @@
   <data name="Title_Date" xml:space="preserve">
     <value>Data</value>
   </data>
-  <data name="Tooltip_Count" xml:space="preserve">
+  <data name="Title_Count" xml:space="preserve">
     <value>Elementy: {0}</value>
   </data>
 </root>

@@ -1,23 +1,27 @@
 ﻿using LiveCharts;
 using LiveCharts.Wpf;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace FinanceTracker.Views
 {
-    public partial class CustomChartTooltip : UserControl, IChartTooltip
+    public partial class CustomChartTooltip : UserControl, IChartTooltip, INotifyPropertyChanged
     {
-        public CustomChartTooltip()
-        {
-            InitializeComponent();
-            DataContext = this;
-        }
+        public static readonly DependencyProperty IsTrendModeProperty = DependencyProperty
+            .Register( nameof(IsTrendMode), typeof(bool), typeof(CustomChartTooltip), new PropertyMetadata(false));
 
         private TooltipData? _data;
+        private TooltipSelectionMode? _selectionMode;
 
         public event PropertyChangedEventHandler? PropertyChanged;
-        public TooltipSelectionMode? SelectionMode { get; set; }
-        public IEnumerable<DataPointViewModel>? DataPoints => Data?.Points;
+
+        public bool IsTrendMode
+        {
+            get => (bool)GetValue(IsTrendModeProperty);
+            set => SetValue(IsTrendModeProperty, value);
+        }
 
         public TooltipData? Data
         {
@@ -25,14 +29,28 @@ namespace FinanceTracker.Views
             set
             {
                 _data = value;
-                OnPropertyChanged(nameof(Data));
-                OnPropertyChanged(nameof(DataPoints));
+                OnPropertyChanged();
             }
         }
 
-        private void OnPropertyChanged(string propertyName)
+        public TooltipSelectionMode? SelectionMode
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            get => _selectionMode;
+            set
+            {
+                _selectionMode = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public CustomChartTooltip()
+        {
+            InitializeComponent();
+        }
+
+        protected void OnPropertyChanged([CallerMemberName] string? name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
 }

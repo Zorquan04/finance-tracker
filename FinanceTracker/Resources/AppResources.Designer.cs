@@ -592,6 +592,15 @@ namespace FinanceTracker.Resources {
         }
         
         /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Elements: {0}.
+        /// </summary>
+        public static string Title_Count {
+            get {
+                return ResourceManager.GetString("Title_Count", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         /// Wyszukuje zlokalizowany ciąg podobny do ciągu Created by Kacper Gumulak / Zorquan04.
         /// </summary>
         public static string Title_CreatedBy {
@@ -732,15 +741,6 @@ namespace FinanceTracker.Resources {
         public static string Tooltip_ClearData {
             get {
                 return ResourceManager.GetString("Tooltip_ClearData", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Elements: {0}.
-        /// </summary>
-        public static string Tooltip_Count {
-            get {
-                return ResourceManager.GetString("Tooltip_Count", resourceCulture);
             }
         }
         

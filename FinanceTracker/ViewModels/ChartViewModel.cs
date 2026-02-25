@@ -3,11 +3,7 @@ using FinanceTracker.Models;
 using FinanceTracker.Resources;
 using FinanceTracker.Services.Interfaces;
 using LiveCharts;
-using LiveCharts.Defaults;
 using LiveCharts.Wpf;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -16,8 +12,9 @@ namespace FinanceTracker.ViewModels;
 public class ChartViewModel : BaseViewModel
 {
     private readonly IChartService _chartService;
-    private List<CategoryStats> _stats = new();
+    private List<ChartData> _stats = new();
 
+    public string[] Labels => IsTrendMode ? TrendLabels ?? Array.Empty<string>() : ColumnLabels ?? Array.Empty<string>();
     public string[]? ColumnLabels { get; set; }
     public string[]? TrendLabels { get; set; }
 
@@ -51,17 +48,24 @@ public class ChartViewModel : BaseViewModel
         _stats = _chartService.GetExpensesByCategory().ToList();
         ColumnLabels = _stats.Select(s => s.Category).ToArray();
 
-        var mapper = LiveCharts.Configurations.Mappers.Xy<CategoryStats>()
-            .X((value, index) => index)
-            .Y(value => (double)value.Total)
-            .Fill(value => GetColorByCategory(value.Category));
+        var dataPoints = _stats.Select(s => new ChartData
+        {
+            Category = s.Category,
+            Total = s.Total,
+            Average = s.Average,
+            Max = s.Max,
+            Count = 0,
+            Date = null
+        }).ToList();
+
+        var mapper = LiveCharts.Configurations.Mappers.Xy<ChartData>().X((value, index) => index).Y(value => (double)value.Total).Fill(value => GetColorByCategory(value.Category));
 
         SeriesCollection = new SeriesCollection(mapper)
         {
             new ColumnSeries
             {
                 Title = AppResources.Title_Expenses,
-                Values = new ChartValues<CategoryStats>(_stats),
+                Values = new ChartValues<ChartData>(dataPoints),
                 MaxColumnWidth = 60,
                 DataLabels = false
             }
@@ -70,21 +74,80 @@ public class ChartViewModel : BaseViewModel
         XFormatter = value =>
         {
             int i = (int)Math.Round(value);
-            if (i >= 0 && i < ColumnLabels.Length) return ColumnLabels[i];
+            if (i >= 0 && i < ColumnLabels.Length) 
+                return ColumnLabels[i];
             return "";
         };
 
         OnPropertyChanged(nameof(SeriesCollection));
         OnPropertyChanged(nameof(XFormatter));
         OnPropertyChanged(nameof(XAxisTitle));
+        OnPropertyChanged(nameof(Labels));
     }
 
     private void LoadTrendChart()
     {
         var expenses = _chartService.GetAllExpenses();
 
-        var grouped = expenses.GroupBy(e => new { e.Category?.DisplayName, Day = e.Date.Date }).Select(g => new { Category = g.Key.DisplayName, Day = g.Key.Day, Total = g.Sum(e => e.Amount), Count = g.Count() }).OrderBy(g => g.Day).ToList(); var categories = grouped.Select(g => g.Category).Distinct(); var allDates = grouped.Select(g => g.Day).Distinct().OrderBy(d => d).ToList(); TrendLabels = allDates.Select(d => d.ToString("dd.MM")).ToArray(); SeriesCollection = new SeriesCollection(); foreach (var category in categories) { var values = new ChartValues<CategoryDay>(); foreach (var date in allDates) { var item = grouped.FirstOrDefault(g => g.Category == category && g.Day == date); values.Add(new CategoryDay { Date = date, Total = item?.Total ?? 0, Count = item?.Count ?? 0 }); } var mapper = LiveCharts.Configurations.Mappers.Xy<CategoryDay>().X(cd => cd.Date.ToOADate()).Y(cd => (double)cd.Total); SeriesCollection.Add(new LineSeries(mapper) { Title = category, Values = values, Stroke = GetColorByCategory(category), Fill = Brushes.Transparent, PointGeometrySize = 6, StrokeThickness = 2 }); }
-        XFormatter = value => DateTime.FromOADate(value).ToString("dd.MM"); OnPropertyChanged(nameof(SeriesCollection)); OnPropertyChanged(nameof(XFormatter)); OnPropertyChanged(nameof(XAxisTitle));
+        var grouped = expenses.GroupBy(e => new { e.Category?.DisplayName, Day = e.Date.Date }).Select(g => new
+            {
+                Category = g.Key.DisplayName!,
+                Day = g.Key.Day,
+                Total = g.Sum(e => e.Amount),
+                Count = g.Count()
+            }).OrderBy(g => g.Day).ToList();
+
+        var categories = grouped.Select(g => g.Category).Distinct().ToList();
+        var allDates = grouped.Select(g => g.Day).Distinct().OrderBy(d => d).ToList();
+
+        TrendLabels = allDates.Select(d => d.ToString("dd.MM")).ToArray();
+
+        SeriesCollection = new SeriesCollection();
+
+        foreach (var category in categories)
+        {
+            var values = new ChartValues<ChartData>();
+
+            for (int i = 0; i < allDates.Count; i++)
+            {
+                var date = allDates[i];
+                var item = grouped.FirstOrDefault(g => g.Category == category && g.Day == date);
+
+                values.Add(new ChartData
+                {
+                    Category = category,
+                    Date = date,
+                    Total = item?.Total ?? 0,
+                    Count = item?.Count ?? 0,
+                    Average = 0,
+                    Max = 0
+                });
+            }
+
+            var mapper = LiveCharts.Configurations.Mappers.Xy<ChartData>().X((cd, index) => index).Y(cd => (double)cd.Total).Fill(cd => Brushes.Transparent);
+
+            SeriesCollection.Add(new LineSeries(mapper)
+            {
+                Title = category,
+                Values = values,
+                Stroke = GetColorByCategory(category),
+                Fill = Brushes.Transparent,
+                PointGeometrySize = 6,
+                StrokeThickness = 2
+            });
+        }
+
+        XFormatter = value =>
+        {
+            int i = (int)Math.Round(value);
+            if (i >= 0 && i < allDates.Count)
+                return allDates[i].ToString("dd.MM");
+            return "";
+        };
+
+        OnPropertyChanged(nameof(SeriesCollection));
+        OnPropertyChanged(nameof(XFormatter));
+        OnPropertyChanged(nameof(XAxisTitle));
     }
 
     public void ToggleChartMode()

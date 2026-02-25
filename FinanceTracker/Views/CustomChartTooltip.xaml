@@ -2,28 +2,34 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:res="clr-namespace:FinanceTracker.Resources"
+             xmlns:help="clr-namespace:FinanceTracker.Helpers"
              Background="{StaticResource AppBackground}">
     <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <help:VisibilityConverter x:Key="VisConverter"/>
     </UserControl.Resources>
 
     <Border BorderBrush="{StaticResource AccentBrush}" BorderThickness="2" Padding="8">
-		<ItemsControl ItemsSource="{Binding DataPoints}">
-			<ItemsControl.ItemTemplate>
+        <ItemsControl ItemsSource="{Binding Data.Points, RelativeSource={RelativeSource AncestorType=UserControl}}">
+            <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Margin="5">
-                        <TextBlock Text="{Binding ChartPoint.Instance.Category}" FontWeight="Bold"/>
+                    <Grid>
+                        <StackPanel>
+                            <StackPanel Visibility="{Binding IsTrendMode, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource VisConverter}}">
+                                <StackPanel Visibility="{Binding ChartPoint.Instance.Count, Converter={StaticResource VisConverter}}">
+                                    <TextBlock Text="{Binding Series.Title}" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding ChartPoint.Instance.Count, StringFormat={x:Static res:AppResources.Title_Count}}"/>
+                                    <TextBlock Text="{Binding ChartPoint.Instance.Total, StringFormat={x:Static res:AppResources.Title_Total}}"/>
+                                </StackPanel>
+                            </StackPanel>
 
-                        <TextBlock Text="{Binding ChartPint.Instance.Count, StringFormat='{x:Static res:AppResources.Tooltip_Count}'}" 
-                                   Visibility="{Binding DataContext.IsTrendMode, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}" />
-
-                        <TextBlock Text="{Binding ChartPoint.Instance.Total, StringFormat={x:Static res:AppResources.Title_Total}}" 
-                                   Visibility="{Binding DataContext.IsTrendMode, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}" />
-                        <TextBlock Text="{Binding ChartPoint.Instance.Average, StringFormat={x:Static res:AppResources.Title_Average}}" 
-                                   Visibility="{Binding DataContext.IsTrendMode, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}" />
-                        <TextBlock Text="{Binding ChartPoint.Instance.Max, StringFormat={x:Static res:AppResources.Title_Max}}" 
-                                   Visibility="{Binding DataContext.IsTrendMode, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}" />
-                    </StackPanel>
+                            <StackPanel Visibility="{Binding IsTrendMode, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource VisConverter}, ConverterParameter=Invert}">
+                                <TextBlock Text="{Binding Series.Title}" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding ChartPoint.Instance.Total, StringFormat={x:Static res:AppResources.Title_Total}}"/>
+                                <TextBlock Text="{Binding ChartPoint.Instance.Average, StringFormat={x:Static res:AppResources.Title_Average}}"/>
+                                <TextBlock Text="{Binding ChartPoint.Instance.Max, StringFormat={x:Static res:AppResources.Title_Max}}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

@@ -14,11 +14,11 @@ public class ChartService : IChartService
         _context = context;
     }
 
-    public IEnumerable<CategoryStats> GetExpensesByCategory()
+    public IEnumerable<ChartData> GetExpensesByCategory()
     {
         var expenses = _context.Expenses.Include(e => e.Category).AsNoTracking().ToList();
 
-        return expenses.GroupBy(e => e.Category!.DisplayName!).Select(g => new CategoryStats
+        return expenses.GroupBy(e => e.Category!.DisplayName!).Select(g => new ChartData
         {
             Category = g.Key,
             Total = g.Sum(e => e.Amount),
