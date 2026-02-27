@@ -22,6 +22,7 @@ public class ChartViewModel : BaseViewModel
     public ICommand ToggleChartCommand { get; }
     public string ToggleChartText => IsTrendMode ? AppResources.Title_ChangeColumn : AppResources.Title_ChangeTrend;
     public string XAxisTitle => IsTrendMode ? AppResources.Title_Date : AppResources.Title_Category;
+    public double AxisXMax { get; set; }
 
     public SeriesCollection? SeriesCollection { get; set; }
     public Func<double, string>? YFormatter { get; set; }
@@ -71,6 +72,8 @@ public class ChartViewModel : BaseViewModel
             }
         };
 
+        AxisXMax = double.NaN;
+
         XFormatter = value =>
         {
             int i = (int)Math.Round(value);
@@ -83,6 +86,7 @@ public class ChartViewModel : BaseViewModel
         OnPropertyChanged(nameof(XFormatter));
         OnPropertyChanged(nameof(XAxisTitle));
         OnPropertyChanged(nameof(Labels));
+        OnPropertyChanged(nameof(AxisXMax));
     }
 
     private void LoadTrendChart()
@@ -100,7 +104,12 @@ public class ChartViewModel : BaseViewModel
         var categories = grouped.Select(g => g.Category).Distinct().ToList();
         var allDates = grouped.Select(g => g.Day).Distinct().OrderBy(d => d).ToList();
 
+        var firstMonthDay = new DateTime(allDates.First().Year, allDates.First().Month, 1);
+        if (!allDates.Contains(firstMonthDay))
+            allDates.Insert(0, firstMonthDay);
+
         TrendLabels = allDates.Select(d => d.ToString("dd.MM")).ToArray();
+        AxisXMax = allDates.Count;
 
         SeriesCollection = new SeriesCollection();
 
@@ -108,23 +117,33 @@ public class ChartViewModel : BaseViewModel
         {
             var values = new ChartValues<ChartData>();
 
-            for (int i = 0; i < allDates.Count; i++)
+            values.Add(new ChartData
             {
-                var date = allDates[i];
-                var item = grouped.FirstOrDefault(g => g.Category == category && g.Day == date);
+                Category = category,
+                Total = 0,
+                Count = 0
+            });
 
+            var categoryItems = grouped.Where(g => g.Category == category).OrderBy(g => g.Day).ToList();
+
+            foreach (var item in categoryItems)
+            {
                 values.Add(new ChartData
                 {
                     Category = category,
-                    Date = date,
-                    Total = item?.Total ?? 0,
-                    Count = item?.Count ?? 0,
-                    Average = 0,
-                    Max = 0
+                    Date = item.Day,
+                    Total = item.Total,
+                    Count = item.Count
                 });
             }
 
-            var mapper = LiveCharts.Configurations.Mappers.Xy<ChartData>().X((cd, index) => index).Y(cd => (double)cd.Total).Fill(cd => Brushes.Transparent);
+            var mapper = LiveCharts.Configurations.Mappers.Xy<ChartData>().X((cd, index) =>
+                {
+                    if (index == 0)
+                        return 0;
+                    var date = categoryItems[index - 1].Day;
+                    return allDates.IndexOf(date);
+                }).Y(cd => (double)cd.Total);
 
             SeriesCollection.Add(new LineSeries(mapper)
             {
@@ -132,8 +151,10 @@ public class ChartViewModel : BaseViewModel
                 Values = values,
                 Stroke = GetColorByCategory(category),
                 Fill = Brushes.Transparent,
+                PointGeometry = DefaultGeometries.Circle,
                 PointGeometrySize = 6,
-                StrokeThickness = 2
+                StrokeThickness = 2,
+                LineSmoothness = 0.6
             });
         }
 
@@ -148,6 +169,7 @@ public class ChartViewModel : BaseViewModel
         OnPropertyChanged(nameof(SeriesCollection));
         OnPropertyChanged(nameof(XFormatter));
         OnPropertyChanged(nameof(XAxisTitle));
+        OnPropertyChanged(nameof(AxisXMax));
     }
 
     public void ToggleChartMode()

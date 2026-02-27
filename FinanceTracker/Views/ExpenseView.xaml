@@ -42,7 +42,7 @@
 
             <Border CornerRadius="12" BorderBrush="#D0D0D0" BorderThickness="1" Padding="3">
                 <DataGrid Background="Transparent" BorderThickness="0" ItemsSource="{Binding ExpensesView}" SelectedItem="{Binding SelectedExpense, Mode=TwoWay}" AutoGenerateColumns="False"
-                          IsReadOnly="True" AlternationCount="2" SelectionMode="Single" HeadersVisibility="Column" RowHeight="28" FontSize="14">
+                          IsReadOnly="True" CanUserSortColumns="False" AlternationCount="2" SelectionMode="Single" HeadersVisibility="Column" RowHeight="28" FontSize="14">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="{x:Static res:AppResources.Header_Name}" Binding="{Binding Name}" Width="*"/>
                         <DataGridTextColumn Header="{x:Static res:AppResources.Header_Amount}" Binding="{Binding Amount, StringFormat=F2}" Width="*"/>

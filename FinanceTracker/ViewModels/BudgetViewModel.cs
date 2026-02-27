@@ -116,6 +116,7 @@ public class BudgetViewModel : BaseViewModel
             _progressBrush.RelativeTransform = new TranslateTransform(_offset, 0);
         };
         _animationTimer.Start();
+        UpdateProgressBrushColor();
     }
 
     private void LoadBudget()
