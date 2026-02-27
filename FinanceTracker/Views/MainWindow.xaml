@@ -9,25 +9,36 @@
         MinHeight="480" MinWidth="800"
         Background="{DynamicResource AppBackground}"
         WindowStartupLocation="CenterScreen">
+
+    <!-- Keyboard shortcuts for common commands -->
     <Window.InputBindings>
         <KeyBinding Key="O" Modifiers="Control" Command="{Binding OpenCommand}" />
+        <!-- Ctrl+O to open -->
         <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveCommand}" />
+        <!-- Ctrl+S to save -->
         <KeyBinding Key="S" Modifiers="Control+Shift" Command="{Binding SaveAsCommand}" />
+        <!-- Ctrl+Shift+S to save as -->
         <KeyBinding Key="Q" Modifiers="Control" Command="{Binding ExitCommand}" />
+        <!-- Ctrl+Q to exit -->
     </Window.InputBindings>
 
+    <!-- Data templates for dynamic view loading -->
     <Window.Resources>
         <DataTemplate DataType="{x:Type vm:ChartViewModel}">
             <v:ChartView/>
+            <!-- Show ChartView when ChartViewModel is active -->
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vm:BudgetViewModel}">
             <v:BudgetView/>
+            <!-- Show BudgetView when BudgetViewModel is active -->
         </DataTemplate>
     </Window.Resources>
 
     <DockPanel>
+        <!-- Main menu bar -->
         <Menu DockPanel.Dock="Top">
+            <!-- File menu -->
             <MenuItem Header="{x:Static res:AppResources.Menu_File}">
                 <MenuItem Header="{x:Static res:AppResources.Menu_Open}" Command="{Binding OpenCommand}" InputGestureText="Ctrl+O" ToolTip="{x:Static res:AppResources.Tooltip_Open}">
                     <MenuItem.Icon>
@@ -52,6 +63,7 @@
                 </MenuItem>
             </MenuItem>
 
+            <!-- Settings menu -->
             <MenuItem Header="{x:Static res:AppResources.Menu_Settings}">
                 <MenuItem Header="{x:Static res:AppResources.Menu_ChangeTheme}" Command="{Binding ChangeThemeCommand}" ToolTip="{x:Static res:AppResources.Tooltip_ChangeTheme}">
                     <MenuItem.Icon>
@@ -70,6 +82,7 @@
                 </MenuItem>
             </MenuItem>
 
+            <!-- Help menu -->
             <MenuItem Header="{x:Static res:AppResources.Menu_Help}">
                 <MenuItem Header="{x:Static res:AppResources.Menu_About}" Command="{Binding ShowAboutCommand}" ToolTip="{x:Static res:AppResources.Tooltip_About}">
                     <MenuItem.Icon>
@@ -84,12 +97,16 @@
             </MenuItem>
         </Menu>
 
+        <!-- Bottom status bar with message and buttons -->
         <Grid DockPanel.Dock="Bottom" Height="50">
             <Grid.RowDefinitions>
                 <RowDefinition Height="15"/>
+                <!-- Status text row -->
                 <RowDefinition Height="35"/>
+                <!-- Buttons row -->
             </Grid.RowDefinitions>
 
+            <!-- Status message display with fade in/out animation -->
             <TextBlock Text="{Binding StatusMessage}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="LimeGreen" FontWeight="Bold" Opacity="0">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
@@ -115,6 +132,7 @@
                 </TextBlock.Style>
             </TextBlock>
 
+            <!-- Navigation buttons for main sections -->
             <StackPanel Grid.Row="1"
                 Orientation="Horizontal"
                 HorizontalAlignment="Center">
@@ -124,6 +142,7 @@
             </StackPanel>
         </Grid>
 
+        <!-- Main content area where views are loaded dynamically -->
         <ContentControl x:Name="MainContent" />
     </DockPanel>
 </Window>

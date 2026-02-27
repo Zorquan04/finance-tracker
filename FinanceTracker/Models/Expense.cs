@@ -2,6 +2,7 @@
 
 namespace FinanceTracker.Models;
 
+// Represents a single expense entry in the tracker
 public class Expense
 {
     [Key]
@@ -17,5 +18,6 @@ public class Expense
 
     public int CategoryId { get; set; }
     public Category? Category { get; set; }
+
     public int OrderIndex { get; set; }
 }

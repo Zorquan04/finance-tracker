@@ -9,16 +9,19 @@ using System.Windows.Media;
 
 namespace FinanceTracker.ViewModels;
 
+// ViewModel for managing charts (column and trend) for expenses
 public class ChartViewModel : BaseViewModel
 {
     private readonly IChartService _chartService;
     private List<ChartData> _stats = new();
 
+    // Labels for X axis depending on mode
     public string[] Labels => IsTrendMode ? TrendLabels ?? Array.Empty<string>() : ColumnLabels ?? Array.Empty<string>();
     public string[]? ColumnLabels { get; set; }
     public string[]? TrendLabels { get; set; }
 
     public bool IsTrendMode { get; set; }
+
     public ICommand ToggleChartCommand { get; }
     public string ToggleChartText => IsTrendMode ? AppResources.Title_ChangeColumn : AppResources.Title_ChangeTrend;
     public string XAxisTitle => IsTrendMode ? AppResources.Title_Date : AppResources.Title_Category;
@@ -28,14 +31,16 @@ public class ChartViewModel : BaseViewModel
     public Func<double, string>? YFormatter { get; set; }
     public Func<double, string>? XFormatter { get; set; }
 
+    // Constructor
     public ChartViewModel(IChartService chartService)
     {
         _chartService = chartService;
-        YFormatter = value => $"{value:N2} zł";
+        YFormatter = value => $"{value:N2} zł"; // format for Y axis
         ToggleChartCommand = new RelayCommand(_ => ToggleChartMode());
         LoadChartData();
     }
 
+    // Load chart data depending on mode
     private void LoadChartData()
     {
         try
@@ -51,6 +56,7 @@ public class ChartViewModel : BaseViewModel
         }
     }
 
+    // Load column chart grouped by category
     private void LoadColumnChart()
     {
         try
@@ -103,14 +109,14 @@ public class ChartViewModel : BaseViewModel
         }
     }
 
+    // Load trend chart showing expenses over time
     private void LoadTrendChart()
     {
         try
         {
             var expenses = _chartService.GetAllExpenses();
 
-            var grouped = expenses.GroupBy(e => new { e.Category?.DisplayName, Day = e.Date.Date })
-                .Select(g => new
+            var grouped = expenses.GroupBy(e => new { e.Category?.DisplayName, Day = e.Date.Date }).Select(g => new
                 {
                     Category = g.Key.DisplayName!,
                     Day = g.Key.Day,
@@ -140,15 +146,15 @@ public class ChartViewModel : BaseViewModel
             foreach (var category in categories)
             {
                 var values = new ChartValues<ChartData>
-            {
-                new ChartData
                 {
-                    Category = category,
-                    Date = minDate,
-                    Total = 0,
-                    Count = 0
-                }
-            };
+                    new ChartData
+                    {
+                        Category = category,
+                        Date = minDate,
+                        Total = 0,
+                        Count = 0
+                    }
+                };
 
                 var categoryItems = grouped.Where(g => g.Category == category).OrderBy(g => g.Day).ToList();
 
@@ -197,6 +203,7 @@ public class ChartViewModel : BaseViewModel
         }
     }
 
+    // Toggle between column and trend chart
     public void ToggleChartMode()
     {
         try
@@ -212,6 +219,7 @@ public class ChartViewModel : BaseViewModel
         }
     }
 
+    // Assign color to a category for chart
     public Brush GetColorByCategory(string? category)
     {
         if (category == AppResources.Category_Food)
@@ -227,6 +235,7 @@ public class ChartViewModel : BaseViewModel
         return Brushes.Gray;
     }
 
+    // Refresh chart data
     public void Refresh()
     {
         try

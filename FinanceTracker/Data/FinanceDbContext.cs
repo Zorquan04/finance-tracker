@@ -5,16 +5,23 @@ namespace FinanceTracker.Data
 {
     public class FinanceDbContext : DbContext
     {
+        // DbSet for storing expenses
         public DbSet<Expense> Expenses { get; set; }
+
+        // DbSet for storing categories
         public DbSet<Category> Categories { get; set; }
+
+        // DbSet for storing monthly budget
         public DbSet<MonthlyBudget> MonthlyBudgets { get; set; }
 
+        // Configure the SQLite database
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
             var path = System.IO.Path.Combine(AppContext.BaseDirectory, "finance.db");
             options.UseSqlite($"Data Source={path}");
         }
 
+        // Seed initial categories
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Category>().HasData(

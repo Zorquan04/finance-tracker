@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FinanceTracker.Models;
 
+// Represents an expense category in the finance tracker.
 public class Category
 {
     [Key]

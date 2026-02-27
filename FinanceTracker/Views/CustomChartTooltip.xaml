@@ -4,30 +4,45 @@
              xmlns:res="clr-namespace:FinanceTracker.Resources"
              xmlns:help="clr-namespace:FinanceTracker.Helpers"
              Background="{StaticResource AppBackground}">
+
+    <!-- Converter to control visibility of elements -->
     <UserControl.Resources>
         <help:VisibilityConverter x:Key="VisConverter"/>
     </UserControl.Resources>
 
+    <!-- Tooltip border -->
     <Border BorderBrush="{StaticResource AccentBrush}" BorderThickness="2" Padding="8">
+        <!-- Display each point in the tooltip -->
         <ItemsControl ItemsSource="{Binding Data.Points, RelativeSource={RelativeSource AncestorType=UserControl}}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Grid>
                         <StackPanel>
+
+                            <!-- Trend mode section -->
                             <StackPanel Visibility="{Binding IsTrendMode, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource VisConverter}}">
                                 <StackPanel Visibility="{Binding ChartPoint.Instance.Count, Converter={StaticResource VisConverter}}">
                                     <TextBlock Text="{Binding Series.Title}" FontWeight="Bold"/>
+                                    <!-- Series name -->
                                     <TextBlock Text="{Binding ChartPoint.Instance.Count, StringFormat={x:Static res:AppResources.Title_Count}}"/>
+                                    <!-- Number of points -->
                                     <TextBlock Text="{Binding ChartPoint.Instance.Total, StringFormat={x:Static res:AppResources.Title_Total}}"/>
+                                    <!-- Total value -->
                                 </StackPanel>
                             </StackPanel>
 
+                            <!-- Normal mode section -->
                             <StackPanel Visibility="{Binding IsTrendMode, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource VisConverter}, ConverterParameter=Invert}">
                                 <TextBlock Text="{Binding Series.Title}" FontWeight="Bold"/>
+                                <!-- Series name -->
                                 <TextBlock Text="{Binding ChartPoint.Instance.Total, StringFormat={x:Static res:AppResources.Title_Total}}"/>
+                                <!-- Total value -->
                                 <TextBlock Text="{Binding ChartPoint.Instance.Average, StringFormat={x:Static res:AppResources.Title_Average}}"/>
+                                <!-- Average value -->
                                 <TextBlock Text="{Binding ChartPoint.Instance.Max, StringFormat={x:Static res:AppResources.Title_Max}}"/>
+                                <!-- Maximum value -->
                             </StackPanel>
+
                         </StackPanel>
                     </Grid>
                 </DataTemplate>

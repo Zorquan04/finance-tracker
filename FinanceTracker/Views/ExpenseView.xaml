@@ -4,6 +4,8 @@
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:vm="clr-namespace:FinanceTracker.ViewModels"
              xmlns:res="clr-namespace:FinanceTracker.Resources">
+
+    <!-- Converter to toggle visibility for filters -->
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </UserControl.Resources>
@@ -11,47 +13,72 @@
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <!-- Input row -->
             <RowDefinition Height="Auto"/>
+            <!-- Filters row -->
             <RowDefinition Height="*"/>
+            <!-- Data grid + actions row -->
         </Grid.RowDefinitions>
 
+        <!-- Row for adding a new expense -->
         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
             <TextBox Width="120" Margin="5" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+            <!-- Expense name -->
             <TextBox Width="80" Margin="5" Text="{Binding Amount, UpdateSourceTrigger=PropertyChanged,StringFormat=F2}" />
+            <!-- Expense amount -->
             <ComboBox Width="120" Margin="5" ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory}" DisplayMemberPath="DisplayName" />
+            <!-- Category selection -->
             <DatePicker Width="140" Margin="5" SelectedDate="{Binding Date, Mode=TwoWay}" DisplayDateEnd="{x:Static sys:DateTime.Now}" />
+            <!-- Expense date -->
             <Button Width="100" Height="25" Content="{Binding AddButtonText}" Command="{Binding AddExpenseCommand}" Margin="10,0,0,0"/>
+            <!-- Add button -->
         </StackPanel>
 
+        <!-- Toggle filters button -->
         <Button Width="120" Height="25" Content="{x:Static res:AppResources.Button_ShowFilters}" Command="{Binding ToggleFiltersCommand}" HorizontalAlignment="Right" Margin="0,0,0,10"/>
 
+        <!-- Filters row (visible only when enabled) -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,10,0,10" Visibility="{Binding FiltersVisible, Converter={StaticResource BoolToVis}}">
             <ComboBox Width="120" ItemsSource="{Binding FilterCategories}" SelectedItem="{Binding SelectedFilterCategory}" DisplayMemberPath="DisplayName" />
+            <!-- Category filter -->
             <DatePicker Width="120" SelectedDate="{Binding StartDate, Mode=TwoWay}" DisplayDateEnd="{x:Static sys:DateTime.Now}" Margin="10,0,0,0" />
+            <!-- Start date filter -->
             <TextBlock VerticalAlignment="Center" Margin="5,0">—</TextBlock>
             <DatePicker Width="120" SelectedDate="{Binding EndDate, Mode=TwoWay}" DisplayDateEnd="{x:Static sys:DateTime.Now}" Margin="0,0,5,0" />
+            <!-- End date filter -->
             <Button Content="{x:Static res:AppResources.Button_Clear}" Margin="5,0,0,0" Command="{Binding ClearDateRangeCommand}" />
+            <!-- Clear filters -->
             <TextBlock Margin="20,0,0,0" VerticalAlignment="Center" FontWeight="Bold" Text="{Binding TotalExpenses, StringFormat={x:Static res:AppResources.Title_Total}}" />
+            <!-- Total expenses display -->
         </StackPanel>
 
+        <!-- Main grid: expense list + action buttons -->
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
+                <!-- Data grid column -->
                 <ColumnDefinition Width="120" />
+                <!-- Buttons column -->
             </Grid.ColumnDefinitions>
 
+            <!-- Data grid showing expenses -->
             <Border CornerRadius="12" BorderBrush="#D0D0D0" BorderThickness="1" Padding="3">
                 <DataGrid Background="Transparent" BorderThickness="0" ItemsSource="{Binding ExpensesView}" SelectedItem="{Binding SelectedExpense, Mode=TwoWay}" AutoGenerateColumns="False"
                           IsReadOnly="True" CanUserSortColumns="False" AlternationCount="2" SelectionMode="Single" HeadersVisibility="Column" RowHeight="28" FontSize="14">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="{x:Static res:AppResources.Header_Name}" Binding="{Binding Name}" Width="*"/>
+                        <!-- Expense name -->
                         <DataGridTextColumn Header="{x:Static res:AppResources.Header_Amount}" Binding="{Binding Amount, StringFormat=F2}" Width="*"/>
+                        <!-- Expense amount -->
                         <DataGridTextColumn Header="{x:Static res:AppResources.Header_Category}" Binding="{Binding Category.DisplayName}" Width="*"/>
+                        <!-- Category -->
                         <DataGridTextColumn Header="{x:Static res:AppResources.Header_Date}" Binding="{Binding Date, StringFormat=dd/MM/yyyy}" Width="*"/>
+                        <!-- Date -->
                     </DataGrid.Columns>
                 </DataGrid>
             </Border>
 
+            <!-- Action buttons for sorting, moving, editing, deleting -->
             <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
                 <StackPanel.Resources>
                     <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
@@ -59,14 +86,17 @@
                     </Style>
                 </StackPanel.Resources>
 
+                <!-- Sorting buttons -->
                 <Button Content="{x:Static res:AppResources.Button_SortName}" Command="{Binding SortByNameCommand}" />
                 <Button Content="{x:Static res:AppResources.Button_SortAmount}" Command="{Binding SortByAmountCommand}" />
                 <Button Content="{x:Static res:AppResources.Button_SortCategory}" Command="{Binding SortByCategoryCommand}" />
                 <Button Content="{x:Static res:AppResources.Button_SortDate}" Command="{Binding SortByDateCommand}" />
 
+                <!-- Move selected expense up/down -->
                 <Button Content="{x:Static res:AppResources.Button_Up}" Command="{Binding MoveUpCommand}" />
                 <Button Content="{x:Static res:AppResources.Button_Down}" Command="{Binding MoveDownCommand}" />
 
+                <!-- Edit and delete selected expense -->
                 <Button Content="{Binding EditButtonText}" Command="{Binding EditCommand}" />
                 <Button Content="{x:Static res:AppResources.Button_Delete}" Command="{Binding DeleteCommand}" />
             </StackPanel>

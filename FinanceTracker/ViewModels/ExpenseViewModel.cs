@@ -9,18 +9,22 @@ using System.Windows.Input;
 
 namespace FinanceTracker.ViewModels;
 
+// ViewModel responsible for managing expenses, categories, filtering, sorting, and editing
 public class ExpenseViewModel : BaseViewModel
 {
+    // Collections for expenses and categories
     public ObservableCollection<Expense> Expenses { get; set; } = new();
     public ObservableCollection<Category> Categories { get; set; } = new();
     public ObservableCollection<Category> FilterCategories { get; set; } = new();
     public ICollectionView ExpensesView { get; }
 
+    // Services and related ViewModels
     private readonly IExpenseService _expenseService;
     private readonly IMessageService _messageService;
     private readonly ChartViewModel _chartVM;
     private readonly BudgetViewModel? _budgetVM;
 
+    // Properties for binding to the UI
     private string _name = "";
     private decimal _amount;
     private decimal _totalExpenses;
@@ -35,24 +39,71 @@ public class ExpenseViewModel : BaseViewModel
     private bool _sortAscending = true;
     private string? _lastSortColumn;
 
-    public string Name { get => _name; set => SetProperty(ref _name, value); }
-    public decimal Amount { get => _amount; set => SetProperty(ref _amount, value); }
-    public decimal TotalExpenses { get => _totalExpenses; set => SetProperty(ref _totalExpenses, value); }
-    public Category? SelectedCategory { get => _selectedCategory; set => SetProperty(ref _selectedCategory, value); }
+    public string Name 
+    { 
+        get => _name; 
+        set => SetProperty(ref _name, value); 
+    }
+
+    public decimal Amount 
+    { 
+        get => _amount;
+        set => SetProperty(ref _amount, value);
+    }
+
+    public decimal TotalExpenses 
+    { 
+        get => _totalExpenses;
+        set => SetProperty(ref _totalExpenses, value);
+    }
+
+    public Category? SelectedCategory
+    { 
+        get => _selectedCategory; 
+        set => SetProperty(ref _selectedCategory, value);
+    }
+
     public Category? SelectedFilterCategory
     {
         get => _selectedFilterCategory;
         set
         {
             if (SetProperty(ref _selectedFilterCategory, value))
+                RefreshView(); // Refresh view when filter changes
+        }
+    }
+
+    public DateTime Date
+    { 
+        get => _date; 
+        set => SetProperty(ref _date, value);
+    }
+
+    public DateTime? StartDate
+    { 
+        get => _startDate;
+        set
+        { 
+            if (SetProperty(ref _startDate, value)) 
                 RefreshView();
         }
     }
 
-    public DateTime Date { get => _date; set => SetProperty(ref _date, value); }
-    public DateTime? StartDate { get => _startDate; set { if (SetProperty(ref _startDate, value)) RefreshView(); } }
-    public DateTime? EndDate { get => _endDate; set { if (SetProperty(ref _endDate, value)) RefreshView(); } }
-    public Expense? SelectedExpense { get => _selectedExpense; set => SetProperty(ref _selectedExpense, value); }
+    public DateTime? EndDate 
+    { 
+        get => _endDate;
+        set 
+        { 
+            if (SetProperty(ref _endDate, value)) 
+                RefreshView();
+        }
+    }
+
+    public Expense? SelectedExpense
+    { 
+        get => _selectedExpense; 
+        set => SetProperty(ref _selectedExpense, value); 
+    }
 
     public bool IsEditing
     {
@@ -61,17 +112,24 @@ public class ExpenseViewModel : BaseViewModel
         {
             if (SetProperty(ref _isEditing, value))
             {
+                // Update button texts when editing state changes
                 OnPropertyChanged(nameof(AddButtonText));
                 OnPropertyChanged(nameof(EditButtonText));
             }
         }
     }
 
-    public bool FiltersVisible { get => _filtersVisible; set => SetProperty(ref _filtersVisible, value); }
+    public bool FiltersVisible 
+    { 
+        get => _filtersVisible; 
+        set => SetProperty(ref _filtersVisible, value);
+    }
+
     public string AddButtonText => IsEditing ? AppResources.Button_Save : AppResources.Button_Add;
     public string EditButtonText => IsEditing ? AppResources.Button_Cancel : AppResources.Button_Edit;
     public bool HasUnsavedChanges => IsEditing || !string.IsNullOrWhiteSpace(Name) || Amount > 0;
 
+    // Commands for the UI
     public ICommand AddExpenseCommand { get; }
     public ICommand EditCommand { get; }
     public ICommand DeleteCommand { get; }
@@ -84,6 +142,7 @@ public class ExpenseViewModel : BaseViewModel
     public ICommand SortByCategoryCommand { get; }
     public ICommand SortByDateCommand { get; }
 
+    // Constructor initializes services, ViewModels, loads data, and sets up commands
     public ExpenseViewModel(IExpenseService expenseService, IMessageService messageService, ChartViewModel chartVM, BudgetViewModel budgetVM)
     {
         _expenseService = expenseService;
@@ -98,6 +157,7 @@ public class ExpenseViewModel : BaseViewModel
         ExpensesView.Filter = FilterExpenses;
         ExpensesView.SortDescriptions.Add(new SortDescription(nameof(Expense.OrderIndex), ListSortDirection.Ascending));
 
+        // Commands with action and conditions
         AddExpenseCommand = new RelayCommand(_ => SaveExpense(), _ => CanAddOrEdit());
         EditCommand = new RelayCommand(_ => { if (IsEditing) CancelEdit(); else StartEdit(); }, _ => SelectedExpense != null);
         DeleteCommand = new RelayCommand(_ => Delete(), _ => SelectedExpense != null);
@@ -110,10 +170,12 @@ public class ExpenseViewModel : BaseViewModel
         SortByCategoryCommand = new RelayCommand(_ => SortBy(e => e.Category?.DisplayName ?? "", AppResources.Header_Category));
         SortByDateCommand = new RelayCommand(_ => SortBy(e => e.Date, AppResources.Header_Date));
 
+        // Set default selected categories
         SelectedCategory = Categories.LastOrDefault();
         SelectedFilterCategory = FilterCategories.FirstOrDefault();
     }
 
+    // Load all categories from the service
     private void LoadCategories()
     {
         try
@@ -131,6 +193,7 @@ public class ExpenseViewModel : BaseViewModel
         }
     }
 
+    // Load all expenses from the service
     private void LoadExpenses()
     {
         try
@@ -145,6 +208,7 @@ public class ExpenseViewModel : BaseViewModel
         }
     }
 
+    // Save either a new expense or update an existing one
     private void SaveExpense()
     {
         if (IsEditing)
@@ -153,6 +217,7 @@ public class ExpenseViewModel : BaseViewModel
             AddExpense();
     }
 
+    // Add a new expense
     private void AddExpense()
     {
         try
@@ -174,6 +239,7 @@ public class ExpenseViewModel : BaseViewModel
         }
     }
 
+    // Update an existing expense
     private void UpdateExpense()
     {
         try
@@ -198,6 +264,7 @@ public class ExpenseViewModel : BaseViewModel
         }
     }
 
+    // Delete selected expense
     private void Delete()
     {
         try
@@ -212,6 +279,7 @@ public class ExpenseViewModel : BaseViewModel
         }
     }
 
+    // Start editing selected expense
     private void StartEdit()
     {
         if (SelectedExpense == null) return;
@@ -222,12 +290,14 @@ public class ExpenseViewModel : BaseViewModel
         IsEditing = true;
     }
 
+    // Cancel editing
     private void CancelEdit()
     {
         ClearForm();
         SelectedExpense = null;
     }
 
+    // Clear input form
     private void ClearForm()
     {
         Name = "";
@@ -236,8 +306,10 @@ public class ExpenseViewModel : BaseViewModel
         IsEditing = false;
     }
 
+    // Check if adding or editing is valid
     private bool CanAddOrEdit() => !string.IsNullOrWhiteSpace(Name) && Amount > 0 && SelectedCategory != null;
 
+    // Filter function for the view
     private bool FilterExpenses(object obj)
     {
         if (obj is not Expense e) return false;
@@ -247,8 +319,10 @@ public class ExpenseViewModel : BaseViewModel
         return true;
     }
 
+    // Update total of filtered expenses
     private void UpdateTotal() => TotalExpenses = Expenses.Where(e => FilterExpenses(e)).Sum(e => e.Amount);
 
+    // Check if budget limit is exceeded
     private void CheckBudgetOverflow()
     {
         if (_budgetVM == null) return;
@@ -257,12 +331,14 @@ public class ExpenseViewModel : BaseViewModel
             _messageService.ShowWarning(AppResources.Dialog_BudgetAlertMessage, AppResources.DialogBudgedAlertTitle);
     }
 
+    // Refresh the expenses view and update total
     private void RefreshView()
     {
         ExpensesView.Refresh();
         UpdateTotal();
     }
 
+    // Sort expenses by a given key
     private void SortBy<T>(Func<Expense, T> keySelector, string columnName)
     {
         try
@@ -271,11 +347,11 @@ public class ExpenseViewModel : BaseViewModel
             _lastSortColumn = columnName;
 
             var sorted = _sortAscending ? Expenses.OrderBy(keySelector).ToList() : Expenses.OrderByDescending(keySelector).ToList();
-            for (int i = 0; i < sorted.Count; i++) 
+            for (int i = 0; i < sorted.Count; i++)
                 sorted[i].OrderIndex = i;
 
             Expenses.Clear();
-            foreach (var e in sorted) 
+            foreach (var e in sorted)
                 Expenses.Add(e);
 
             ExpensesView.Refresh();
@@ -287,6 +363,7 @@ public class ExpenseViewModel : BaseViewModel
         }
     }
 
+    // Swap the order of expenses in the list
     private void SwapOrder(bool moveUp)
     {
         try
@@ -312,6 +389,7 @@ public class ExpenseViewModel : BaseViewModel
         }
     }
 
+    // Actions to perform after database changes
     private void AfterDatabaseChange()
     {
         try
@@ -328,6 +406,7 @@ public class ExpenseViewModel : BaseViewModel
         }
     }
 
+    // Reload all data
     public void Reload()
     {
         try
