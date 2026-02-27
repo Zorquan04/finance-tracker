@@ -360,4 +360,76 @@
   <data name="Title_Count" xml:space="preserve">
     <value>Elementy: {0}</value>
   </data>
+  <data name="Error_HandlerTitle" xml:space="preserve">
+    <value>Błąd krytyczny</value>
+  </data>
+  <data name="Error_HandlerMessage" xml:space="preserve">
+    <value>Wystąpił wyjątek krytyczny:</value>
+  </data>
+  <data name="Error_Save" xml:space="preserve">
+    <value>Nie udało się zapisać pliku.</value>
+  </data>
+  <data name="Error_SaveAs" xml:space="preserve">
+    <value>Nie udało się zapisać pliku jako CSV.</value>
+  </data>
+  <data name="Error_Open" xml:space="preserve">
+    <value>Nie udało się otworzyć pliku CSV.</value>
+  </data>
+  <data name="Error_Export" xml:space="preserve">
+    <value>Nie udało się wyeksportować danych do pliku.</value>
+  </data>
+  <data name="Error_Clear" xml:space="preserve">
+    <value>Nie udało się wyczyścić danych.</value>
+  </data>
+  <data name="Error_LoadCategories" xml:space="preserve">
+    <value>Nie udało się wczytać kategorii wydatków.</value>
+  </data>
+  <data name="Error_LoadExpenses" xml:space="preserve">
+    <value>Nie udało się wczytać wydatków.</value>
+  </data>
+  <data name="Error_AddExpense" xml:space="preserve">
+    <value>Nie udało się dodać wydatku.</value>
+  </data>
+  <data name="Error_UpdateExpense" xml:space="preserve">
+    <value>Nie udało się zaktualizować wydatku.</value>
+  </data>
+  <data name="Error_Delete" xml:space="preserve">
+    <value>Nie udało się usunąć wydatku.</value>
+  </data>
+  <data name="Error_Sort" xml:space="preserve">
+    <value>Nie udało się posortować wydatków.</value>
+  </data>
+  <data name="Error_Swap" xml:space="preserve">
+    <value>Nie udało się przesunąć wydatku.</value>
+  </data>
+  <data name="Error_AfterDatabaseChange" xml:space="preserve">
+    <value>Nie udało się zaktualizować widoku po zmianach w bazie.</value>
+  </data>
+  <data name="Error_Reload" xml:space="preserve">
+    <value>Nie udało się odświeżyć danych wydatków.</value>
+  </data>
+  <data name="Error_Refresh" xml:space="preserve">
+    <value>Nie udało się odświeżyć wykresu.</value>
+  </data>
+  <data name="Error_Toggle" xml:space="preserve">
+    <value>Nie udało się przełączyć trybu wykresu.</value>
+  </data>
+  <data name="Error_LoadTrendChart" xml:space="preserve">
+    <value>Nie udało się wczytać wykresu trendu.</value>
+  </data>
+  <data name="Error_LoadColumnChart" xml:space="preserve">
+    <value>Nie udało się wczytać wykresu kolumnowego.</value>
+  </data>
+  <data name="Error_LoadChartData" xml:space="preserve">
+    <value>Nie udało się wczytać danych wykresu.</value>
+  </data>
+  <data name="Error_SaveBudget" xml:space="preserve">
+    <value>Nie udało się zapisać budżetu.</value>
+  </data>
+  <data name="Error_UpdateSpent" xml:space="preserve">
+    <value>Nie udało się zaktualizować wydatków.</value>
+  </data>
+  <data name="Error_LoadBudget" xml:space="preserve">
+    <value>Nie udało się wczytać budżetu. Aplikacja zostanie zamknięta.</value>
+  </data>
 </root>

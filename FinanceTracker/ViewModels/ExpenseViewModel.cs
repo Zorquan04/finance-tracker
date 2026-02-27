@@ -116,18 +116,33 @@ public class ExpenseViewModel : BaseViewModel
 
     private void LoadCategories()
     {
-        var categories = _expenseService.GetAllCategories();
-        Categories = new ObservableCollection<Category>(categories);
-        FilterCategories = new ObservableCollection<Category>(new[] { new Category { Id = 0, Name = "All" } }.Concat(categories));
-        OnPropertyChanged(nameof(Categories));
-        OnPropertyChanged(nameof(FilterCategories));
+        try
+        {
+            var categories = _expenseService.GetAllCategories();
+            Categories = new ObservableCollection<Category>(categories);
+            FilterCategories = new ObservableCollection<Category>(new[] { new Category { Id = 0, Name = "All" } }.Concat(categories));
+
+            OnPropertyChanged(nameof(Categories));
+            OnPropertyChanged(nameof(FilterCategories));
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.Handle(ex, AppResources.Error_LoadCategories);
+        }
     }
 
     private void LoadExpenses()
     {
-        Expenses.Clear();
-        foreach (var e in _expenseService.GetAllExpenses())
-            Expenses.Add(e);
+        try
+        {
+            Expenses.Clear();
+            foreach (var e in _expenseService.GetAllExpenses())
+                Expenses.Add(e);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.Handle(ex, AppResources.Error_LoadExpenses);
+        }
     }
 
     private void SaveExpense()
@@ -140,39 +155,61 @@ public class ExpenseViewModel : BaseViewModel
 
     private void AddExpense()
     {
-        _expenseService.AddExpense(new Expense
+        try
         {
-            Name = Name,
-            Amount = Amount,
-            Date = Date,
-            CategoryId = SelectedCategory!.Id
-        });
+            _expenseService.AddExpense(new Expense
+            {
+                Name = Name,
+                Amount = Amount,
+                Date = Date,
+                CategoryId = SelectedCategory!.Id
+            });
 
-        AfterDatabaseChange();
-        ClearForm();
+            AfterDatabaseChange();
+            ClearForm();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.Handle(ex, AppResources.Error_AddExpense);
+        }
     }
 
     private void UpdateExpense()
     {
-        if (SelectedExpense == null) return;
-        _expenseService.UpdateExpense(new Expense
+        try
         {
-            Id = SelectedExpense.Id,
-            Name = Name,
-            Amount = Amount,
-            Date = Date,
-            CategoryId = SelectedCategory!.Id
-        });
+            if (SelectedExpense == null) return;
 
-        AfterDatabaseChange();
-        ClearForm();
+            _expenseService.UpdateExpense(new Expense
+            {
+                Id = SelectedExpense.Id,
+                Name = Name,
+                Amount = Amount,
+                Date = Date,
+                CategoryId = SelectedCategory!.Id
+            });
+
+            AfterDatabaseChange();
+            ClearForm();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.Handle(ex, AppResources.Error_UpdateExpense);
+        }
     }
 
     private void Delete()
     {
-        if (SelectedExpense == null) return;
-        _expenseService.DeleteExpense(SelectedExpense.Id);
-        AfterDatabaseChange();
+        try
+        {
+            if (SelectedExpense == null) return;
+            _expenseService.DeleteExpense(SelectedExpense.Id);
+            AfterDatabaseChange();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.Handle(ex, AppResources.Error_Delete);
+        }
     }
 
     private void StartEdit()
@@ -228,51 +265,80 @@ public class ExpenseViewModel : BaseViewModel
 
     private void SortBy<T>(Func<Expense, T> keySelector, string columnName)
     {
-        _sortAscending = _lastSortColumn == columnName ? !_sortAscending : true;
-        _lastSortColumn = columnName;
+        try
+        {
+            _sortAscending = _lastSortColumn == columnName ? !_sortAscending : true;
+            _lastSortColumn = columnName;
 
-        var sorted = _sortAscending ? Expenses.OrderBy(keySelector).ToList() : Expenses.OrderByDescending(keySelector).ToList();
-        for (int i = 0; i < sorted.Count; i++) sorted[i].OrderIndex = i;
+            var sorted = _sortAscending ? Expenses.OrderBy(keySelector).ToList() : Expenses.OrderByDescending(keySelector).ToList();
+            for (int i = 0; i < sorted.Count; i++) 
+                sorted[i].OrderIndex = i;
 
-        Expenses.Clear();
-        foreach (var e in sorted) Expenses.Add(e);
+            Expenses.Clear();
+            foreach (var e in sorted) 
+                Expenses.Add(e);
 
-        ExpensesView.Refresh();
-        _expenseService.UpdateOrder(Expenses.ToList());
+            ExpensesView.Refresh();
+            _expenseService.UpdateOrder(Expenses.ToList());
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.Handle(ex, AppResources.Error_Swap);
+        }
     }
 
     private void SwapOrder(bool moveUp)
     {
-        if (SelectedExpense == null || ExpensesView is not ListCollectionView view) return;
+        try
+        {
+            if (SelectedExpense == null || ExpensesView is not ListCollectionView view) return;
 
-        int index = view.IndexOf(SelectedExpense);
-        int targetIndex = moveUp ? index - 1 : index + 1;
-        if (targetIndex < 0 || targetIndex >= view.Count) return;
+            int index = view.IndexOf(SelectedExpense);
+            int targetIndex = moveUp ? index - 1 : index + 1;
+            if (targetIndex < 0 || targetIndex >= view.Count) return;
 
-        var current = (Expense)view.GetItemAt(index);
-        var target = (Expense)view.GetItemAt(targetIndex);
+            var current = (Expense)view.GetItemAt(index);
+            var target = (Expense)view.GetItemAt(targetIndex);
 
-        _expenseService.SwapOrder(current.Id, target.Id);
+            _expenseService.SwapOrder(current.Id, target.Id);
 
-        Expenses.Move(Expenses.IndexOf(current), Expenses.IndexOf(target));
-        SelectedExpense = current;
-        ExpensesView.Refresh();
+            Expenses.Move(Expenses.IndexOf(current), Expenses.IndexOf(target));
+            SelectedExpense = current;
+            ExpensesView.Refresh();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.Handle(ex, AppResources.Error_Swap);
+        }
     }
 
     private void AfterDatabaseChange()
     {
-        LoadExpenses();
-        RefreshView();
-        _chartVM.Refresh();
-        _budgetVM?.UpdateSpent();
-
-        CheckBudgetOverflow();
+        try
+        {
+            LoadExpenses();
+            RefreshView();
+            _chartVM.Refresh();
+            _budgetVM?.UpdateSpent();
+            CheckBudgetOverflow();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.Handle(ex, AppResources.Error_AfterDatabaseChange);
+        }
     }
 
     public void Reload()
     {
-        LoadCategories();
-        LoadExpenses();
-        RefreshView();
+        try
+        {
+            LoadCategories();
+            LoadExpenses();
+            RefreshView();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.Handle(ex, AppResources.Error_Reload);
+        }
     }
 }

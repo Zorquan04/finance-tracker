@@ -376,6 +376,222 @@ namespace FinanceTracker.Resources {
         }
         
         /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Failed to add expense..
+        /// </summary>
+        public static string Error_AddExpense {
+            get {
+                return ResourceManager.GetString("Error_AddExpense", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Failed to update view after database changes..
+        /// </summary>
+        public static string Error_AfterDatabaseChange {
+            get {
+                return ResourceManager.GetString("Error_AfterDatabaseChange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Failed to clear data..
+        /// </summary>
+        public static string Error_Clear {
+            get {
+                return ResourceManager.GetString("Error_Clear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Failed to delete expense..
+        /// </summary>
+        public static string Error_Delete {
+            get {
+                return ResourceManager.GetString("Error_Delete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Failed to export data to file..
+        /// </summary>
+        public static string Error_Export {
+            get {
+                return ResourceManager.GetString("Error_Export", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu A fatal exception occurred:.
+        /// </summary>
+        public static string Error_HandlerMessage {
+            get {
+                return ResourceManager.GetString("Error_HandlerMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Critical Error.
+        /// </summary>
+        public static string Error_HandlerTitle {
+            get {
+                return ResourceManager.GetString("Error_HandlerTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu The budget could not be loaded. The application will be closed..
+        /// </summary>
+        public static string Error_LoadBudget {
+            get {
+                return ResourceManager.GetString("Error_LoadBudget", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Failed to load expense category..
+        /// </summary>
+        public static string Error_LoadCategories {
+            get {
+                return ResourceManager.GetString("Error_LoadCategories", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Failed to load chart data..
+        /// </summary>
+        public static string Error_LoadChartData {
+            get {
+                return ResourceManager.GetString("Error_LoadChartData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Failed to load column chart..
+        /// </summary>
+        public static string Error_LoadColumnChart {
+            get {
+                return ResourceManager.GetString("Error_LoadColumnChart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Failed to load expenses..
+        /// </summary>
+        public static string Error_LoadExpenses {
+            get {
+                return ResourceManager.GetString("Error_LoadExpenses", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Failed to load trend graph..
+        /// </summary>
+        public static string Error_LoadTrendChart {
+            get {
+                return ResourceManager.GetString("Error_LoadTrendChart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Failed to open CSV file..
+        /// </summary>
+        public static string Error_Open {
+            get {
+                return ResourceManager.GetString("Error_Open", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Failed to refresh chart..
+        /// </summary>
+        public static string Error_Refresh {
+            get {
+                return ResourceManager.GetString("Error_Refresh", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Failed to refresh expense data..
+        /// </summary>
+        public static string Error_Reload {
+            get {
+                return ResourceManager.GetString("Error_Reload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Failed to save file..
+        /// </summary>
+        public static string Error_Save {
+            get {
+                return ResourceManager.GetString("Error_Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Failed to save file as CSV..
+        /// </summary>
+        public static string Error_SaveAs {
+            get {
+                return ResourceManager.GetString("Error_SaveAs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Failed to save budget..
+        /// </summary>
+        public static string Error_SaveBudget {
+            get {
+                return ResourceManager.GetString("Error_SaveBudget", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Failed to sort expenses..
+        /// </summary>
+        public static string Error_Sort {
+            get {
+                return ResourceManager.GetString("Error_Sort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Failed to postpone the expense..
+        /// </summary>
+        public static string Error_Swap {
+            get {
+                return ResourceManager.GetString("Error_Swap", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Failed to switch graph mode..
+        /// </summary>
+        public static string Error_Toggle {
+            get {
+                return ResourceManager.GetString("Error_Toggle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Failed to update expense..
+        /// </summary>
+        public static string Error_UpdateExpense {
+            get {
+                return ResourceManager.GetString("Error_UpdateExpense", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Expenses could not be updated..
+        /// </summary>
+        public static string Error_UpdateSpent {
+            get {
+                return ResourceManager.GetString("Error_UpdateSpent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         /// Wyszukuje zlokalizowany ciąg podobny do ciągu Amount.
         /// </summary>
         public static string Header_Amount {

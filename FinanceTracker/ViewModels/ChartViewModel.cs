@@ -38,146 +38,178 @@ public class ChartViewModel : BaseViewModel
 
     private void LoadChartData()
     {
-        if (IsTrendMode)
-            LoadTrendChart();
-        else
-            LoadColumnChart();
+        try
+        {
+            if (IsTrendMode)
+                LoadTrendChart();
+            else
+                LoadColumnChart();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.Handle(ex, AppResources.Error_LoadChartData);
+        }
     }
 
     private void LoadColumnChart()
     {
-        _stats = _chartService.GetExpensesByCategory().ToList();
-        ColumnLabels = _stats.Select(s => s.Category).ToArray();
-
-        var dataPoints = _stats.Select(s => new ChartData
+        try
         {
-            Category = s.Category,
-            Total = s.Total,
-            Average = s.Average,
-            Max = s.Max,
-            Count = 0,
-            Date = null
-        }).ToList();
+            _stats = _chartService.GetExpensesByCategory().ToList();
+            ColumnLabels = _stats.Select(s => s.Category).ToArray();
 
-        var mapper = LiveCharts.Configurations.Mappers.Xy<ChartData>().X((value, index) => index).Y(value => (double)value.Total).Fill(value => GetColorByCategory(value.Category));
-
-        SeriesCollection = new SeriesCollection(mapper)
-        {
-            new ColumnSeries
+            var dataPoints = _stats.Select(s => new ChartData
             {
-                Title = AppResources.Title_Expenses,
-                Values = new ChartValues<ChartData>(dataPoints),
-                MaxColumnWidth = 60,
-                DataLabels = false
-            }
-        };
+                Category = s.Category,
+                Total = s.Total,
+                Average = s.Average,
+                Max = s.Max,
+                Count = 0,
+                Date = null
+            }).ToList();
 
-        AxisXMax = double.NaN;
+            var mapper = LiveCharts.Configurations.Mappers.Xy<ChartData>().X((value, index) => index).Y(value => (double)value.Total).Fill(value => GetColorByCategory(value.Category));
 
-        XFormatter = value =>
+            SeriesCollection = new SeriesCollection(mapper)
+            {
+                new ColumnSeries
+                {
+                    Title = AppResources.Title_Expenses,
+                    Values = new ChartValues<ChartData>(dataPoints),
+                    MaxColumnWidth = 60,
+                    DataLabels = false
+                }
+            };
+
+            AxisXMax = double.NaN;
+
+            XFormatter = value =>
+            {
+                int i = (int)Math.Round(value);
+                if (i >= 0 && i < ColumnLabels.Length)
+                    return ColumnLabels[i];
+                return "";
+            };
+
+            OnPropertyChanged(nameof(SeriesCollection));
+            OnPropertyChanged(nameof(XFormatter));
+            OnPropertyChanged(nameof(XAxisTitle));
+            OnPropertyChanged(nameof(Labels));
+            OnPropertyChanged(nameof(AxisXMax));
+        }
+        catch (Exception ex)
         {
-            int i = (int)Math.Round(value);
-            if (i >= 0 && i < ColumnLabels.Length) 
-                return ColumnLabels[i];
-            return "";
-        };
-
-        OnPropertyChanged(nameof(SeriesCollection));
-        OnPropertyChanged(nameof(XFormatter));
-        OnPropertyChanged(nameof(XAxisTitle));
-        OnPropertyChanged(nameof(Labels));
-        OnPropertyChanged(nameof(AxisXMax));
+            ErrorHandler.Handle(ex, AppResources.Error_LoadColumnChart);
+        }
     }
 
     private void LoadTrendChart()
     {
-        var expenses = _chartService.GetAllExpenses();
-
-        var grouped = expenses.GroupBy(e => new { e.Category?.DisplayName, Day = e.Date.Date }).Select(g => new
-            {
-                Category = g.Key.DisplayName!,
-                Day = g.Key.Day,
-                Total = g.Sum(e => e.Amount),
-                Count = g.Count()
-            }).OrderBy(g => g.Day).ToList();
-
-        var categories = grouped.Select(g => g.Category).Distinct().ToList();
-        var allDates = grouped.Select(g => g.Day).Distinct().OrderBy(d => d).ToList();
-
-        var firstMonthDay = new DateTime(allDates.First().Year, allDates.First().Month, 1);
-        if (!allDates.Contains(firstMonthDay))
-            allDates.Insert(0, firstMonthDay);
-
-        TrendLabels = allDates.Select(d => d.ToString("dd.MM")).ToArray();
-        AxisXMax = allDates.Count;
-
-        SeriesCollection = new SeriesCollection();
-
-        foreach (var category in categories)
+        try
         {
-            var values = new ChartValues<ChartData>();
+            var expenses = _chartService.GetAllExpenses();
 
-            values.Add(new ChartData
+            var grouped = expenses.GroupBy(e => new { e.Category?.DisplayName, Day = e.Date.Date })
+                .Select(g => new
+                {
+                    Category = g.Key.DisplayName!,
+                    Day = g.Key.Day,
+                    Total = g.Sum(e => e.Amount),
+                    Count = g.Count()
+                }).OrderBy(g => g.Day).ToList();
+
+            if (!grouped.Any())
             {
-                Category = category,
-                Total = 0,
-                Count = 0
-            });
+                SeriesCollection = new SeriesCollection();
+                TrendLabels = Array.Empty<string>();
+                return;
+            }
 
-            var categoryItems = grouped.Where(g => g.Category == category).OrderBy(g => g.Day).ToList();
+            var categories = grouped.Select(g => g.Category).Distinct().ToList();
 
-            foreach (var item in categoryItems)
+            var allExpenseDates = grouped.Select(g => g.Day).ToList();
+            var minDate = new DateTime(allExpenseDates.Min().Year, allExpenseDates.Min().Month, 1);
+            var maxDate = new DateTime(allExpenseDates.Max().Year, allExpenseDates.Max().Month, DateTime.DaysInMonth(allExpenseDates.Max().Year, allExpenseDates.Max().Month));
+
+            var allDates = Enumerable.Range(0, (maxDate - minDate).Days + 1).Select(offset => minDate.AddDays(offset)).ToList();
+
+            TrendLabels = allDates.Select(d => d.ToString("dd.MM")).ToArray();
+            SeriesCollection = new SeriesCollection();
+            AxisXMax = allDates.Count - 1;
+
+            foreach (var category in categories)
             {
-                values.Add(new ChartData
+                var values = new ChartValues<ChartData>
+            {
+                new ChartData
                 {
                     Category = category,
-                    Date = item.Day,
-                    Total = item.Total,
-                    Count = item.Count
+                    Date = minDate,
+                    Total = 0,
+                    Count = 0
+                }
+            };
+
+                var categoryItems = grouped.Where(g => g.Category == category).OrderBy(g => g.Day).ToList();
+
+                foreach (var item in categoryItems)
+                {
+                    values.Add(new ChartData
+                    {
+                        Category = category,
+                        Date = item.Day,
+                        Total = item.Total,
+                        Count = item.Count
+                    });
+                }
+
+                var mapper = LiveCharts.Configurations.Mappers.Xy<ChartData>().X((cd, index) => allDates.IndexOf(cd.Date!.Value)).Y(cd => (double)cd.Total);
+
+                SeriesCollection.Add(new LineSeries(mapper)
+                {
+                    Title = category,
+                    Values = values,
+                    Stroke = GetColorByCategory(category),
+                    Fill = Brushes.Transparent,
+                    PointGeometry = DefaultGeometries.Circle,
+                    PointGeometrySize = 6,
+                    StrokeThickness = 2,
+                    LineSmoothness = 1
                 });
             }
 
-            var mapper = LiveCharts.Configurations.Mappers.Xy<ChartData>().X((cd, index) =>
-                {
-                    if (index == 0)
-                        return 0;
-                    var date = categoryItems[index - 1].Day;
-                    return allDates.IndexOf(date);
-                }).Y(cd => (double)cd.Total);
-
-            SeriesCollection.Add(new LineSeries(mapper)
+            XFormatter = value =>
             {
-                Title = category,
-                Values = values,
-                Stroke = GetColorByCategory(category),
-                Fill = Brushes.Transparent,
-                PointGeometry = DefaultGeometries.Circle,
-                PointGeometrySize = 6,
-                StrokeThickness = 2,
-                LineSmoothness = 0.6
-            });
+                int i = (int)Math.Round(value);
+                if (i >= 0 && i < allDates.Count)
+                    return allDates[i].ToString("dd.MM");
+                return "";
+            };
+
+            OnPropertyChanged(nameof(SeriesCollection));
+            OnPropertyChanged(nameof(XFormatter));
+            OnPropertyChanged(nameof(XAxisTitle));
+            OnPropertyChanged(nameof(AxisXMax));
         }
-
-        XFormatter = value =>
+        catch (Exception ex)
         {
-            int i = (int)Math.Round(value);
-            if (i >= 0 && i < allDates.Count)
-                return allDates[i].ToString("dd.MM");
-            return "";
-        };
-
-        OnPropertyChanged(nameof(SeriesCollection));
-        OnPropertyChanged(nameof(XFormatter));
-        OnPropertyChanged(nameof(XAxisTitle));
-        OnPropertyChanged(nameof(AxisXMax));
+            ErrorHandler.Handle(ex, AppResources.Error_LoadTrendChart);
+        }
     }
 
     public void ToggleChartMode()
     {
-        IsTrendMode = !IsTrendMode;
-        LoadChartData();
-        OnPropertyChanged(nameof(IsTrendMode));
-        OnPropertyChanged(nameof(ToggleChartText));
+        try
+        {
+            IsTrendMode = !IsTrendMode;
+            LoadChartData();
+            OnPropertyChanged(nameof(IsTrendMode));
+            OnPropertyChanged(nameof(ToggleChartText));
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.Handle(ex, AppResources.Error_Toggle);
+        }
     }
 
     public Brush GetColorByCategory(string? category)
@@ -195,5 +227,15 @@ public class ChartViewModel : BaseViewModel
         return Brushes.Gray;
     }
 
-    public void Refresh() => LoadChartData();
+    public void Refresh()
+    {
+        try
+        {
+            LoadChartData();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.Handle(ex, AppResources.Error_Refresh);
+        }
+    }
 }

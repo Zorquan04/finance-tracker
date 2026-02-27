@@ -97,11 +97,11 @@ public class BudgetViewModel : BaseViewModel
             StartPoint = new System.Windows.Point(0, 0),
             EndPoint = new System.Windows.Point(1, 0),
             GradientStops = new GradientStopCollection
-        {
-            new GradientStop(Colors.Green, 0),
-            new GradientStop(Colors.LightGreen, 0.5),
-            new GradientStop(Colors.Green, 1)
-        },
+            {
+                new GradientStop(Colors.Green, 0),
+                new GradientStop(Colors.LightGreen, 0.5),
+                new GradientStop(Colors.Green, 1)
+            },
             RelativeTransform = new TranslateTransform(_offset, 0)
         };
 
@@ -112,7 +112,8 @@ public class BudgetViewModel : BaseViewModel
         _animationTimer.Tick += (s, e) =>
         {
             _offset += 0.01;
-            if (_offset > 1) _offset = -1;
+            if (_offset > 1) 
+                _offset = -1;
             _progressBrush.RelativeTransform = new TranslateTransform(_offset, 0);
         };
         _animationTimer.Start();
@@ -121,37 +122,58 @@ public class BudgetViewModel : BaseViewModel
 
     private void LoadBudget()
     {
-        var budget = _budgetService.GetCurrentBudget();
-        _originalMonthlyLimit = budget.Limit;
-        MonthlyLimit = budget.Limit;
-        UpdateSpent();
+        try
+        {
+            var budget = _budgetService.GetCurrentBudget();
+            _originalMonthlyLimit = budget.Limit;
+            MonthlyLimit = budget.Limit;
+            UpdateSpent();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.Handle(ex, AppResources.Error_LoadBudget);
+        }
     }
 
     public void UpdateSpent()
     {
-        SpentThisMonth = _budgetService.GetSpentThisMonth();
-        SpentLastWeek = _budgetService.GetSpentLastWeek();
-        RemainingBudget = MonthlyLimit - SpentThisMonth;
+        try
+        {
+            SpentThisMonth = _budgetService.GetSpentThisMonth();
+            SpentLastWeek = _budgetService.GetSpentLastWeek();
+            RemainingBudget = MonthlyLimit - SpentThisMonth;
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.Handle(ex, AppResources.Error_UpdateSpent);
+        }
     }
 
     private void SaveBudget()
     {
-        var now = DateTime.Now;
-        var budget = new MonthlyBudget
+        try
         {
-            Year = now.Year,
-            Month = now.Month,
-            Limit = MonthlyLimit
-        };
-        _budgetService.SaveBudget(budget);
+            var now = DateTime.Now;
+            var budget = new MonthlyBudget
+            {
+                Year = now.Year,
+                Month = now.Month,
+                Limit = MonthlyLimit
+            };
+            _budgetService.SaveBudget(budget);
 
-        _originalMonthlyLimit = MonthlyLimit;
-        UpdateSpent();
+            _originalMonthlyLimit = MonthlyLimit;
+            UpdateSpent();
 
-        if (SpentThisMonth > MonthlyLimit && MonthlyLimit > 0)
-            _messageService.ShowWarning(AppResources.Dialog_BudgetAlert2Message, AppResources.Dialog_BudgetAlert2Title);
+            if (SpentThisMonth > MonthlyLimit && MonthlyLimit > 0)
+                _messageService.ShowWarning(AppResources.Dialog_BudgetAlert2Message, AppResources.Dialog_BudgetAlert2Title);
 
-        BudgetSaved?.Invoke();
+            BudgetSaved?.Invoke();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.Handle(ex, AppResources.Error_SaveBudget);
+        }
     }
 
     private void UpdateProgressBrushColor()

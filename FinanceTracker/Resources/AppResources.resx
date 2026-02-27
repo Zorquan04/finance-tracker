@@ -360,4 +360,76 @@
   <data name="Title_Count" xml:space="preserve">
     <value>Elements: {0}</value>
   </data>
+  <data name="Error_HandlerTitle" xml:space="preserve">
+    <value>Critical Error</value>
+  </data>
+  <data name="Error_HandlerMessage" xml:space="preserve">
+    <value>A fatal exception occurred:</value>
+  </data>
+  <data name="Error_Save" xml:space="preserve">
+    <value>Failed to save file.</value>
+  </data>
+  <data name="Error_SaveAs" xml:space="preserve">
+    <value>Failed to save file as CSV.</value>
+  </data>
+  <data name="Error_Open" xml:space="preserve">
+    <value>Failed to open CSV file.</value>
+  </data>
+  <data name="Error_Export" xml:space="preserve">
+    <value>Failed to export data to file.</value>
+  </data>
+  <data name="Error_Clear" xml:space="preserve">
+    <value>Failed to clear data.</value>
+  </data>
+  <data name="Error_LoadCategories" xml:space="preserve">
+    <value>Failed to load expense category.</value>
+  </data>
+  <data name="Error_LoadExpenses" xml:space="preserve">
+    <value>Failed to load expenses.</value>
+  </data>
+  <data name="Error_AddExpense" xml:space="preserve">
+    <value>Failed to add expense.</value>
+  </data>
+  <data name="Error_UpdateExpense" xml:space="preserve">
+    <value>Failed to update expense.</value>
+  </data>
+  <data name="Error_Delete" xml:space="preserve">
+    <value>Failed to delete expense.</value>
+  </data>
+  <data name="Error_Sort" xml:space="preserve">
+    <value>Failed to sort expenses.</value>
+  </data>
+  <data name="Error_Swap" xml:space="preserve">
+    <value>Failed to postpone the expense.</value>
+  </data>
+  <data name="Error_AfterDatabaseChange" xml:space="preserve">
+    <value>Failed to update view after database changes.</value>
+  </data>
+  <data name="Error_Reload" xml:space="preserve">
+    <value>Failed to refresh expense data.</value>
+  </data>
+  <data name="Error_Refresh" xml:space="preserve">
+    <value>Failed to refresh chart.</value>
+  </data>
+  <data name="Error_Toggle" xml:space="preserve">
+    <value>Failed to switch graph mode.</value>
+  </data>
+  <data name="Error_LoadTrendChart" xml:space="preserve">
+    <value>Failed to load trend graph.</value>
+  </data>
+  <data name="Error_LoadColumnChart" xml:space="preserve">
+    <value>Failed to load column chart.</value>
+  </data>
+  <data name="Error_LoadChartData" xml:space="preserve">
+    <value>Failed to load chart data.</value>
+  </data>
+  <data name="Error_SaveBudget" xml:space="preserve">
+    <value>Failed to save budget.</value>
+  </data>
+  <data name="Error_UpdateSpent" xml:space="preserve">
+    <value>Expenses could not be updated.</value>
+  </data>
+  <data name="Error_LoadBudget" xml:space="preserve">
+    <value>The budget could not be loaded. The application will be closed.</value>
+  </data>
 </root>

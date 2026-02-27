@@ -88,100 +88,130 @@ public class MainViewModel : BaseViewModel
 
     private void Save()
     {
-        if (string.IsNullOrEmpty(_currentFilePath))
+        try
         {
-            SaveAs();
-            return;
-        }
+            if (string.IsNullOrEmpty(_currentFilePath))
+            {
+                SaveAs();
+                return;
+            }
 
-        ExportToFile(_currentFilePath);
+            ExportToFile(_currentFilePath);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.Handle(ex, AppResources.Error_Save);
+        }
     }
 
     private void SaveAs()
     {
-        var dialog = new SaveFileDialog
+        try
         {
-            Filter = "CSV files (*.csv)|*.csv",
-            DefaultExt = ".csv"
-        };
+            var dialog = new SaveFileDialog
+            {
+                Filter = "CSV files (*.csv)|*.csv",
+                DefaultExt = ".csv"
+            };
 
-        if (dialog.ShowDialog() == true)
+            if (dialog.ShowDialog() == true)
+            {
+                _currentFilePath = dialog.FileName;
+                ExportToFile(_currentFilePath);
+            }
+        }
+        catch (Exception ex)
         {
-            _currentFilePath = dialog.FileName;
-            ExportToFile(_currentFilePath);
+            ErrorHandler.Handle(ex, AppResources.Error_SaveAs);
         }
     }
 
     private void Open()
     {
-        var dialog = new OpenFileDialog { Filter = "CSV files (*.csv)|*.csv" };
-        if (dialog.ShowDialog() != true) return;
-        _currentFilePath = dialog.FileName;
-
-        var (expenses, limit) = _csvService.Import(_currentFilePath);
-
-        _expenseService.ClearAllExpenses();
-
-        var existingCategories = _expenseService.GetAllCategories();
-        var otherCategory = existingCategories.First(c => c.Name == CategoryType.Other.ToString());
-
-        foreach (var e in expenses)
+        try
         {
-            var categoryName = e.Category?.Name;
+            var dialog = new OpenFileDialog { Filter = "CSV files (*.csv)|*.csv" };
+            if (dialog.ShowDialog() != true) return;
+            _currentFilePath = dialog.FileName;
 
-            CategoryType parsedType;
+            var (expenses, limit) = _csvService.Import(_currentFilePath);
 
-            if (!Enum.TryParse(categoryName, true, out parsedType))
-                parsedType = CategoryType.Other;
+            _expenseService.ClearAllExpenses();
 
-            var matchedCategory = existingCategories.FirstOrDefault(c => c.Name == parsedType.ToString());
+            var existingCategories = _expenseService.GetAllCategories();
+            var otherCategory = existingCategories.First(c => c.Name == CategoryType.Other.ToString());
 
-            var finalCategory = matchedCategory ?? otherCategory;
-
-            e.CategoryId = finalCategory.Id;
-            e.Category = null;
-
-            _expenseService.AddExpense(e);
-        }
-
-        if (limit > 0)
-        {
-            var budget = new MonthlyBudget
+            foreach (var e in expenses)
             {
-                Year = DateTime.Now.Year,
-                Month = DateTime.Now.Month,
-                Limit = limit
-            };
-            _budgetService.SaveBudget(budget);
-        }
+                CategoryType parsedType;
+                if (!Enum.TryParse(e.Category?.Name, true, out parsedType))
+                    parsedType = CategoryType.Other;
 
-        ExpensesVM.Reload();
-        ChartVM.Refresh();
-        BudgetVM.Reload();
+                var matchedCategory = existingCategories.FirstOrDefault(c => c.Name == parsedType.ToString());
+                var finalCategory = matchedCategory ?? otherCategory;
+
+                e.CategoryId = finalCategory.Id;
+                e.Category = null;
+
+                _expenseService.AddExpense(e);
+            }
+
+            if (limit > 0)
+            {
+                var budget = new MonthlyBudget
+                {
+                    Year = DateTime.Now.Year,
+                    Month = DateTime.Now.Month,
+                    Limit = limit
+                };
+                _budgetService.SaveBudget(budget);
+            }
+
+            ExpensesVM.Reload();
+            ChartVM.Refresh();
+            BudgetVM.Reload();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.Handle(ex, AppResources.Error_Open);
+        }
     }
 
     private void ExportToFile(string path)
     {
-        var expenses = _expenseService.GetAllExpenses();
-        var limit = _budgetService.GetCurrentBudget()?.Limit ?? 0;
+        try
+        {
+            var expenses = _expenseService.GetAllExpenses();
+            var limit = _budgetService.GetCurrentBudget()?.Limit ?? 0;
 
-        _csvService.Export(path, expenses, limit);
+            _csvService.Export(path, expenses, limit);
 
-        ShowSuccess(AppResources.Title_ChangesSaved);
+            ShowSuccess(AppResources.Title_ChangesSaved);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.Handle(ex, AppResources.Error_Export);
+        }
     }
 
     private void ClearData()
     {
-        if (!_messageService.Confirm(AppResources.Dialog_ClearDataMessage, AppResources.Dialog_ClearDataTitle))
-            return;
+        try
+        {
+            if (!_messageService.Confirm(AppResources.Dialog_ClearDataMessage, AppResources.Dialog_ClearDataTitle)) return;
 
-        _expenseService.ClearAllExpenses();
+            _expenseService.ClearAllExpenses();
 
-        ExpensesVM.Reload();
-        ChartVM.Refresh();
-        BudgetVM.Reload();
+            ExpensesVM.Reload();
+            ChartVM.Refresh();
+            BudgetVM.Reload();
 
-        ShowSuccess(AppResources.TItle_AllDataCleared);
+            ShowSuccess(AppResources.TItle_AllDataCleared);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.Handle(ex, AppResources.Error_Clear);
+        }
     }
 
     private void ChangeTheme()
