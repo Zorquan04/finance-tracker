@@ -8,20 +8,30 @@ using System.Windows.Threading;
 
 namespace FinanceTracker.ViewModels;
 
+// ViewModel for managing the monthly budget, spent amounts, and progress bar
 public class BudgetViewModel : BaseViewModel
 {
     private readonly IBudgetService _budgetService;
     private readonly IMessageService _messageService;
+
+    // Command to save the monthly budget
     public ICommand SaveBudgetCommand { get; }
 
+    // Event triggered after successfully saving the budget
     public event Action? BudgetSaved;
 
-    public decimal UsedPercentage => MonthlyLimit == 0 ? 0 : SpentThisMonth / MonthlyLimit * 100;
-    public bool HasUnsavedChanges => _monthlyLimit != _originalMonthlyLimit;
-    public bool IsOverBudget => MonthlyLimit > 0 && SpentThisMonth > MonthlyLimit;
-
+    // Backing fields
     private decimal _monthlyLimit;
     private decimal _originalMonthlyLimit;
+    private decimal _spentThisMonth;
+    private decimal _spentLastWeek;
+    private decimal _remainingBudget;
+    private bool _overBudget;
+    private LinearGradientBrush _progressBrush;
+    private readonly DispatcherTimer _animationTimer;
+    private double _offset = 0;
+
+    // Monthly budget limit set by the user
     public decimal MonthlyLimit
     {
         get => _monthlyLimit;
@@ -34,7 +44,7 @@ public class BudgetViewModel : BaseViewModel
         }
     }
 
-    private decimal _spentThisMonth;
+    // Total spent this month
     public decimal SpentThisMonth
     {
         get => _spentThisMonth;
@@ -48,21 +58,21 @@ public class BudgetViewModel : BaseViewModel
         }
     }
 
-    private decimal _spentLastWeek;
+    // Total spent in the last 7 days
     public decimal SpentLastWeek
     {
         get => _spentLastWeek;
         private set { _spentLastWeek = value; OnPropertyChanged(); }
     }
 
-    private decimal _remainingBudget;
+    // Remaining budget for the current month
     public decimal RemainingBudget
     {
         get => _remainingBudget;
         private set { _remainingBudget = value; OnPropertyChanged(); }
     }
 
-    private bool _overBudget;
+    // Flag indicating if the user is over the budget
     public bool OverBudget
     {
         get => _overBudget;
@@ -74,24 +84,35 @@ public class BudgetViewModel : BaseViewModel
         }
     }
 
-    private LinearGradientBrush _progressBrush;
+    // Percentage of budget used
+    public decimal UsedPercentage => MonthlyLimit == 0 ? 0 : SpentThisMonth / MonthlyLimit * 100;
+
+    // True if the monthly limit has been modified but not saved
+    public bool HasUnsavedChanges => _monthlyLimit != _originalMonthlyLimit;
+
+    // True if spent this month exceeds the monthly limit
+    public bool IsOverBudget => MonthlyLimit > 0 && SpentThisMonth > MonthlyLimit;
+
+    // Gradient brush for progress bar, changes color based on budget usage
     public LinearGradientBrush ProgressBrush
     {
         get => _progressBrush;
         private set { _progressBrush = value; OnPropertyChanged(); }
     }
 
-    private readonly DispatcherTimer _animationTimer;
-    private double _offset = 0;
-
+    // Constructor initializes services, commands, and animated progress brush
     public BudgetViewModel(IBudgetService budgetService, IMessageService messageService)
     {
         _budgetService = budgetService;
         _messageService = messageService;
 
+        // Load initial budget values
         LoadBudget();
+
+        // Initialize save command
         SaveBudgetCommand = new RelayCommand(_ => SaveBudget());
 
+        // Initialize gradient brush for progress bar
         _progressBrush = new LinearGradientBrush
         {
             StartPoint = new System.Windows.Point(0, 0),
@@ -105,10 +126,8 @@ public class BudgetViewModel : BaseViewModel
             RelativeTransform = new TranslateTransform(_offset, 0)
         };
 
-        _animationTimer = new DispatcherTimer
-        {
-            Interval = TimeSpan.FromMilliseconds(30)
-        };
+        // Timer for animating the gradient movement
+        _animationTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(30) };
         _animationTimer.Tick += (s, e) =>
         {
             _offset += 0.01;
@@ -117,9 +136,11 @@ public class BudgetViewModel : BaseViewModel
             _progressBrush.RelativeTransform = new TranslateTransform(_offset, 0);
         };
         _animationTimer.Start();
+
         UpdateProgressBrushColor();
     }
 
+    // Loads current budget from the service
     private void LoadBudget()
     {
         try
@@ -135,6 +156,7 @@ public class BudgetViewModel : BaseViewModel
         }
     }
 
+    // Updates spent values and remaining budget from the service
     public void UpdateSpent()
     {
         try
@@ -149,6 +171,7 @@ public class BudgetViewModel : BaseViewModel
         }
     }
 
+    // Saves the current monthly budget to the service
     private void SaveBudget()
     {
         try
@@ -160,11 +183,12 @@ public class BudgetViewModel : BaseViewModel
                 Month = now.Month,
                 Limit = MonthlyLimit
             };
-            _budgetService.SaveBudget(budget);
 
+            _budgetService.SaveBudget(budget);
             _originalMonthlyLimit = MonthlyLimit;
             UpdateSpent();
 
+            // Alert if budget exceeded
             if (SpentThisMonth > MonthlyLimit && MonthlyLimit > 0)
                 _messageService.ShowWarning(AppResources.Dialog_BudgetAlert2Message, AppResources.Dialog_BudgetAlert2Title);
 
@@ -176,6 +200,7 @@ public class BudgetViewModel : BaseViewModel
         }
     }
 
+    // Updates progress brush colors based on current budget usage
     private void UpdateProgressBrushColor()
     {
         if (_progressBrush == null) return;
@@ -188,5 +213,6 @@ public class BudgetViewModel : BaseViewModel
         _progressBrush.GradientStops[2].Color = color1;
     }
 
+    // Reloads budget data from the service
     public void Reload() => LoadBudget();
 }

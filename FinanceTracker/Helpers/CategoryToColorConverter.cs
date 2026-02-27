@@ -6,6 +6,7 @@ namespace FinanceTracker.Helpers;
 
 public class CategoryToColorConverter : IValueConverter
 {
+    // Convert category name to a specific brush color
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         var category = value as string;
@@ -21,5 +22,6 @@ public class CategoryToColorConverter : IValueConverter
         };
     }
 
+    // Not needed for one-way binding
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
 }

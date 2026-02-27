@@ -4,6 +4,7 @@ namespace FinanceTracker.Helpers;
 
 public static class CategoryTranslator
 {
+    // Translate internal category code to user-friendly display name
     public static string Translate(string code)
     {
         return code switch

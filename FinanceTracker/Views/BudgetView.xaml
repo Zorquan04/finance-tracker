@@ -3,33 +3,47 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="clr-namespace:FinanceTracker.ViewModels"
              xmlns:res="clr-namespace:FinanceTracker.Resources">
+
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <!-- Header row with monthly budget input -->
             <RowDefinition Height="60"/>
+            <!-- Spacer or optional space -->
             <RowDefinition Height="Auto"/>
+            <!-- Summary info (spent/remaining) -->
             <RowDefinition Height="*"/>
+            <!-- Progress bar row -->
         </Grid.RowDefinitions>
 
+        <!-- Monthly budget input and save button -->
         <StackPanel Orientation="Horizontal" Margin="0,0,0,20" HorizontalAlignment="Center">
             <TextBlock VerticalAlignment="Center" Text="{x:Static res:AppResources.Title_MonthlyBudget}" FontWeight="Bold"/>
+            <!-- Label -->
             <TextBox Width="100" Margin="10,0,0,0" Text="{Binding MonthlyLimit, UpdateSourceTrigger=PropertyChanged,StringFormat=F2}" />
+            <!-- Monthly limit input -->
             <Button Content="{x:Static res:AppResources.Button_Save}" Width="80" Margin="10,0,0,0" Command="{Binding SaveBudgetCommand}"/>
+            <!-- Save button -->
         </StackPanel>
 
+        <!-- Summary of budget usage -->
         <Border Grid.Row="2" CornerRadius="10" BorderThickness="2" Background="{StaticResource AccentBrush}"
-        BorderBrush="{StaticResource HeaderBrush}" Padding="15" HorizontalAlignment="Center">
+                BorderBrush="{StaticResource HeaderBrush}" Padding="15" HorizontalAlignment="Center">
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+
+                <!-- Spent this month -->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,0,5">
                     <TextBlock Text="{x:Static res:AppResources.Title_SpentThisMonth}" FontWeight="Bold"/>
                     <TextBlock Text="{Binding SpentThisMonth, StringFormat={}{0:N2} zł}" Margin="10,0,0,0"/>
                 </StackPanel>
 
+                <!-- Spent last week -->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,0,5">
                     <TextBlock Text="{x:Static res:AppResources.Title_SpentLastWeek}" FontWeight="Bold"/>
                     <TextBlock Text="{Binding SpentLastWeek, StringFormat={}{0:N2} zł}" Margin="10,0,0,0"/>
                 </StackPanel>
 
+                <!-- Remaining budget -->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                     <TextBlock Text="{x:Static res:AppResources.Title_Remaining}" FontWeight="Bold"/>
                     <TextBlock Text="{Binding RemainingBudget, StringFormat={}{0:N2} zł}" Margin="10,0,0,0"/>
@@ -37,12 +51,15 @@
             </StackPanel>
         </Border>
 
+        <!-- Progress bar showing actual usage -->
         <StackPanel Grid.Row="3" VerticalAlignment="Bottom" Margin="0,10,0,0">
             <TextBlock Text="{x:Static res:AppResources.Title_ActualState}" HorizontalAlignment="Center" VerticalAlignment="Top" FontWeight="Bold" Margin="0,0,0,5"/>
 
             <Border CornerRadius="8" BorderThickness="6" BorderBrush="#555" Background="#222" Height="30" VerticalAlignment="Bottom">
                 <Grid>
+                    <!-- Progress bar bound to UsedPercentage and colored dynamically -->
                     <ProgressBar Height="30" Minimum="0" Maximum="100" Value="{Binding UsedPercentage, Mode=OneWay}" VerticalAlignment="Bottom" Foreground="{Binding ProgressBrush}" Background="#222" />
+                    <!-- Text overlay showing percentage -->
                     <TextBlock Text="{Binding UsedPercentage, StringFormat={}{0:F0}%}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="White"/>
                 </Grid>
             </Border>

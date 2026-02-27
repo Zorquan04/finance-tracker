@@ -1,5 +1,6 @@
 ﻿namespace FinanceTracker.Models;
 
+// Represents aggregated data used for chart visualization
 public class ChartData
 {
     public decimal Total { get; set; }

@@ -11,12 +11,17 @@
 
     <Grid Margin="20">
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+
+            <!-- Application name -->
             <TextBlock Text="Finance Tracker" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
 
+            <!-- Version text, set in code-behind -->
             <TextBlock x:Name="VersionText" HorizontalAlignment="Center" Margin="0,0,0,5"/>
 
+            <!-- Creator / author info -->
             <TextBlock Text="{x:Static res:AppResources.Title_CreatedBy}" HorizontalAlignment="Center" Margin="0,0,0,15"/>
 
+            <!-- Button to open GitHub page -->
             <Button Content="{x:Static res:AppResources.Button_OpenGithub}" Width="200" HorizontalAlignment="Center" Click="OpenGitHub_Click" Background="{DynamicResource AccentBrush}" Foreground="White"/>
         </StackPanel>
     </Grid>

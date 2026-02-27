@@ -8,12 +8,15 @@ using System.Windows;
 
 namespace FinanceTracker.ViewModels;
 
+// Main ViewModel for the application, handles commands, file operations, and communicates with services
 public class MainViewModel : BaseViewModel
 {
+    // Events to notify the view to switch between sections
     public event Action? ShowExpensesRequested;
     public event Action? ShowChartsRequested;
     public event Action? ShowBudgetRequested;
 
+    // Services injected via constructor
     private readonly ICsvService _csvService;
     private readonly IMessageService _messageService;
     private readonly IExpenseService _expenseService;
@@ -21,6 +24,7 @@ public class MainViewModel : BaseViewModel
     private readonly IChartService _chartService;
     private string? _currentFilePath;
 
+    // Commands exposed to the UI
     public RelayCommand ShowExpensesCommand { get; }
     public RelayCommand ShowChartsCommand { get; }
     public RelayCommand ShowBudgetCommand { get; }
@@ -34,10 +38,12 @@ public class MainViewModel : BaseViewModel
     public RelayCommand ShowAboutCommand { get; }
     public RelayCommand OpenUserGuideCommand { get; }
 
+    // Sub ViewModels
     public ChartViewModel ChartVM { get; }
     public ExpenseViewModel ExpensesVM { get; }
     public BudgetViewModel BudgetVM { get; }
 
+    // Status bar properties
     private string _statusMessage = "";
     public string StatusMessage
     {
@@ -52,9 +58,11 @@ public class MainViewModel : BaseViewModel
         set => SetProperty(ref _isStatusVisible, value);
     }
 
+    // Indicates if there are unsaved changes in any section
     public bool HasUnsavedChanges => ExpensesVM?.HasUnsavedChanges == true || BudgetVM?.HasUnsavedChanges == true;
     public IMessageService MessageService => _messageService;
 
+    // Constructor, initializes services, ViewModels, and commands
     public MainViewModel(ICsvService csvService, IMessageService messageService, IExpenseService expenseService, IBudgetService budgetService, IChartService chartService)
     {
         _csvService = csvService;
@@ -67,32 +75,38 @@ public class MainViewModel : BaseViewModel
         BudgetVM = new BudgetViewModel(_budgetService, _messageService);
         ExpensesVM = new ExpenseViewModel(_expenseService, _messageService, ChartVM, BudgetVM);
 
+        // Section switching commands
         ShowExpensesCommand = new RelayCommand(_ => ShowExpensesRequested?.Invoke());
         ShowChartsCommand = new RelayCommand(_ => ShowChartsRequested?.Invoke());
         ShowBudgetCommand = new RelayCommand(_ => ShowBudgetRequested?.Invoke());
 
+        // File operations commands
         SaveCommand = new RelayCommand(_ => Save());
         SaveAsCommand = new RelayCommand(_ => SaveAs());
         OpenCommand = new RelayCommand(_ => Open());
         ExitCommand = new RelayCommand(_ => Application.Current.Shutdown());
 
+        // Settings commands
         ChangeThemeCommand = new RelayCommand(_ => ChangeTheme());
         ChangeLanguageCommand = new RelayCommand(_ => ChangeLanguage());
         ClearDataCommand = new RelayCommand(_ => ClearData());
 
+        // Help & About commands
         ShowAboutCommand = new RelayCommand(_ => ShowAbout());
         OpenUserGuideCommand = new RelayCommand(_ => OpenUserGuide());
 
+        // Hook event to show success message after budget save
         BudgetVM.BudgetSaved += () => ShowSuccess(AppResources.Title_ChangesSaved);
     }
 
+    // Saves current data to the current file path
     private void Save()
     {
         try
         {
             if (string.IsNullOrEmpty(_currentFilePath))
             {
-                SaveAs();
+                SaveAs(); // If no file selected, trigger Save As
                 return;
             }
 
@@ -104,6 +118,7 @@ public class MainViewModel : BaseViewModel
         }
     }
 
+    // Opens SaveFileDialog to select file path, then exports data
     private void SaveAs()
     {
         try
@@ -126,6 +141,7 @@ public class MainViewModel : BaseViewModel
         }
     }
 
+    // Opens OpenFileDialog, imports CSV data, and populates services
     private void Open()
     {
         try
@@ -156,6 +172,7 @@ public class MainViewModel : BaseViewModel
                 _expenseService.AddExpense(e);
             }
 
+            // Set budget limit if exists
             if (limit > 0)
             {
                 var budget = new MonthlyBudget
@@ -167,6 +184,7 @@ public class MainViewModel : BaseViewModel
                 _budgetService.SaveBudget(budget);
             }
 
+            // Refresh all ViewModels
             ExpensesVM.Reload();
             ChartVM.Refresh();
             BudgetVM.Reload();
@@ -177,6 +195,7 @@ public class MainViewModel : BaseViewModel
         }
     }
 
+    // Helper to export data to CSV
     private void ExportToFile(string path)
     {
         try
@@ -194,6 +213,7 @@ public class MainViewModel : BaseViewModel
         }
     }
 
+    // Clears all data after user confirmation
     private void ClearData()
     {
         try
@@ -214,12 +234,12 @@ public class MainViewModel : BaseViewModel
         }
     }
 
+    // Switch between light and dark themes
     private void ChangeTheme()
     {
         var confirmed = _messageService.Confirm(AppResources.Dialog_ChangeThemeMessege, AppResources.Dialog_ChangeThemeTitle);
 
-        if (!confirmed)
-            return;
+        if (!confirmed) return;
 
         var newTheme = Properties.Settings.Default.Theme == "Light" ? "Dark" : "Light";
 
@@ -229,12 +249,12 @@ public class MainViewModel : BaseViewModel
         RestartApplication();
     }
 
+    // Switch language between English and Polish
     private void ChangeLanguage()
     {
         var confirmed = _messageService.Confirm(AppResources.Dialog_ChangeLanguageMessage, AppResources.Dialog_ChangeLanguageTitle);
 
-        if (!confirmed)
-            return;
+        if (!confirmed) return;
 
         var newLang = Properties.Settings.Default.Language == "en-GB" ? "pl-PL" : "en-GB";
 
@@ -244,6 +264,7 @@ public class MainViewModel : BaseViewModel
         RestartApplication();
     }
 
+    // Open About window
     private void ShowAbout()
     {
         var aboutWindow = new Views.AboutWindow
@@ -254,6 +275,7 @@ public class MainViewModel : BaseViewModel
         aboutWindow.ShowDialog();
     }
 
+    // Open online user guide
     private void OpenUserGuide()
     {
         Process.Start(new ProcessStartInfo
@@ -263,6 +285,7 @@ public class MainViewModel : BaseViewModel
         });
     }
 
+    // Restarts the application after changing settings
     private void RestartApplication()
     {
         var exePath = Process.GetCurrentProcess().MainModule!.FileName!;
@@ -276,6 +299,7 @@ public class MainViewModel : BaseViewModel
         Application.Current.Shutdown();
     }
 
+    // Show temporary status message at the bottom
     public async void ShowSuccess(string message)
     {
         StatusMessage = message;

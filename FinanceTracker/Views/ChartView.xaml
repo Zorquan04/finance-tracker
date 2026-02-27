@@ -5,17 +5,23 @@
              xmlns:help="clr-namespace:FinanceTracker.Helpers"
              xmlns:views="clr-namespace:FinanceTracker.Views"
              xmlns:res="clr-namespace:FinanceTracker.Resources">
+
     <UserControl.Resources>
+        <!-- Converter to map categories to colors -->
         <help:CategoryToColorConverter x:Key="CategoryToColorConverter"/>
     </UserControl.Resources>
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <!-- Header row with toggle button -->
             <RowDefinition Height="*" />
+            <!-- Chart row -->
             <RowDefinition Height="Auto" />
+            <!-- Legend row -->
         </Grid.RowDefinitions>
 
+        <!-- Header with toggle text and chart switch button -->
         <Grid Grid.Row="0" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -24,22 +30,28 @@
 
             <TextBlock Grid.Column="0" Text="{Binding ToggleChartText}" VerticalAlignment="Center" HorizontalAlignment="Right" FontWeight="Bold" FontSize="14" />
             <Button Grid.Column="1" Content="⇆" Width="40" Height="30" Command="{Binding ToggleChartCommand}" />
+            <!-- Switch between chart types -->
         </Grid>
 
+        <!-- Cartesian chart -->
         <lc:CartesianChart Grid.Row="1" Series="{Binding SeriesCollection}">
+            <!-- Custom tooltip for chart points -->
             <lc:CartesianChart.DataTooltip>
                 <views:CustomChartTooltip IsTrendMode="{Binding IsTrendMode}" />
             </lc:CartesianChart.DataTooltip>
 
+            <!-- X-axis configuration -->
             <lc:CartesianChart.AxisX>
                 <lc:Axis Title="{Binding XAxisTitle}" MaxValue="{Binding AxisXMax}" LabelFormatter="{Binding XFormatter}" />
             </lc:CartesianChart.AxisX>
 
+            <!-- Y-axis configuration -->
             <lc:CartesianChart.AxisY>
                 <lc:Axis Title="{x:Static res:AppResources.Title_Amount}" LabelFormatter="{Binding YFormatter}" />
             </lc:CartesianChart.AxisY>
         </lc:CartesianChart>
 
+        <!-- Legend showing categories and colors -->
         <ItemsControl Grid.Row="2" ItemsSource="{Binding Labels}" Margin="0,15,0,0">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -50,7 +62,9 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal" Margin="12,5">
+                        <!-- Color box for category -->
                         <Rectangle Width="14" Height="14" Fill="{Binding Converter={StaticResource CategoryToColorConverter}}" Margin="0,0,6,0"/>
+                        <!-- Category label -->
                         <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </DataTemplate>

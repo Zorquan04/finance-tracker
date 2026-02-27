@@ -8,17 +8,24 @@
         WindowStartupLocation='CenterScreen'
         ResizeMode="NoResize"
         WindowStyle="ToolWindow">
+
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
+            <!-- Message row -->
             <RowDefinition Height="Auto" />
+            <!-- Buttons row -->
         </Grid.RowDefinitions>
 
+        <!-- Display the confirmation message -->
         <TextBlock Text="{Binding Message}" TextWrapping="Wrap" VerticalAlignment="Center" FontSize="14"/>
 
+        <!-- Yes/No buttons aligned to the right -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
             <Button Content="{x:Static res:AppResources.Title_Yes}" Width="80" Margin="0,0,10,0" Click="Yes_Click"/>
+            <!-- Yes button -->
             <Button Content="{x:Static res:AppResources.Title_No}" Width="80" Margin="0,0,10,0" Click="No_Click"/>
+            <!-- No button -->
         </StackPanel>
     </Grid>
 </Window>
